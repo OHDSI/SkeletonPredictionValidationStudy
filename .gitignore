@@ -1,16 +1,4 @@
-# RStudio files
-.Rproj.user/
-
-# History files
-.Rhistory
-.Rapp.history
-
-# Session Data files
-.RData
-
-# Output data
-*.rda
-
-# System files
-.DS_Store
 .Rproj.user
+.Rhistory
+.RData
+.Ruserdata
