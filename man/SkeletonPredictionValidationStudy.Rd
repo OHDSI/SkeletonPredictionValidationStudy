@@ -4,6 +4,3 @@
 \name{SkeletonPredictionValidationStudy}
 \alias{SkeletonPredictionValidationStudy}
 \title{SkeletonPredictionValidationStudy}
-\description{
-SkeletonPredictionValidationStudy
-}
