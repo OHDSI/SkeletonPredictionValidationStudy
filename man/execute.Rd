@@ -13,6 +13,7 @@ execute(
   cohortTable,
   outputFolder,
   createCohorts = T,
+  recalibrate = NULL,
   runValidation = T,
   packageResults = T,
   minCellCount = 5,
@@ -47,6 +48,8 @@ study.}
 (/)}
 
 \item{createCohorts}{Whether to create the cohorts for the study}
+
+\item{recalibrate}{Whether to recalibrate ('recalibrationintheLarge' and/or 'weakRecalibration')}
 
 \item{runValidation}{Whether to run the valdiation models}
 

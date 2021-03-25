@@ -19,6 +19,7 @@
 #' @param cohortTable          The name of the table that will be created in the work database schema.
 #'                             This table will hold the exposure and outcome cohorts used in this
 #'                             study.
+#' @param recalibrate          Whether to recalibrate ('recalibrationintheLarge' and/or 'weakRecalibration')
 #' @param outputFolder         Name of local folder to place results; make sure to use forward slashes
 #'                             (/)
 #' @param createCohorts        Whether to create the cohorts for the study
@@ -37,6 +38,7 @@ execute <- function(connectionDetails,
                     cohortTable,
                     outputFolder,
                     createCohorts = T,
+                    recalibrate = NULL,
                     runValidation = T,
                     packageResults = T,
                     minCellCount = 5,
@@ -76,6 +78,7 @@ execute <- function(connectionDetails,
                                                        validationTableOutcome = cohortTable,
                                                        sampleSize = sampleSize,
                                                        keepPrediction = keepPrediction,
+                                                       recalibrate = recalibrate,
                                                        verbosity = verbosity)
   }
 
