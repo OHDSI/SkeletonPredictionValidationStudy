@@ -11,6 +11,7 @@
 #' @param cdmDatabaseSchema    Schema name where your patient-level data in OMOP CDM format resides.
 #'                             Note that for SQL Server, this should include both the database and
 #'                             schema name, for example 'cdm_data.dbo'.
+#' @param cdmVersion           CDM version
 #' @param cohortDatabaseSchema Schema name where intermediate data can be stored. You will need to have
 #'                             write priviliges in this schema. Note that for SQL Server, this should
 #'                             include both the database and schema name, for example 'cdm_data.dbo'.
@@ -33,6 +34,7 @@
 execute <- function(connectionDetails,
                     databaseName,
                     cdmDatabaseSchema,
+                    cdmVersion,
                     cohortDatabaseSchema,
                     oracleTempSchema,
                     cohortTable,
@@ -64,22 +66,47 @@ execute <- function(connectionDetails,
   if(runValidation){
     ParallelLogger::logInfo("Validating Models")
     # for each model externally validate
-    analysesLocation <- system.file("plp_models",
+
+    settingsLocation <- system.file("models",
                                     package = "SkeletonPredictionValidationStudy")
-    val <- PatientLevelPrediction::evaluateMultiplePlp(analysesLocation = analysesLocation,
-                                                       outputLocation = outputFolder,
-                                                       connectionDetails = connectionDetails,
-                                                       validationSchemaTarget = cohortDatabaseSchema,
-                                                       validationSchemaOutcome = cohortDatabaseSchema,
-                                                       validationSchemaCdm = cdmDatabaseSchema,
-                                                       oracleTempSchema = oracleTempSchema,
-                                                       databaseNames = databaseName,
-                                                       validationTableTarget = cohortTable,
-                                                       validationTableOutcome = cohortTable,
-                                                       sampleSize = sampleSize,
-                                                       keepPrediction = keepPrediction,
-                                                       recalibrate = recalibrate,
-                                                       verbosity = verbosity)
+
+    # if settings json is missing run old code
+    if(settingsLocation != ""){
+      ParallelLogger::logInfo("Executing Models Using Settings")
+      runModelsFromSetting(outputLocation = outputFolder,
+                                  connectionDetails = connectionDetails,
+                                  cohortDatabaseSchema = cohortDatabaseSchema,
+                                  outcomeDatabaseSchema = outcomeDatabaseSchema,
+                                  cdmDatabaseSchema = cdmDatabaseSchema,
+                           cdmVersion = cdmVersion,
+                                  oracleTempSchema = oracleTempSchema,
+                                  databaseName = databaseName,
+                                  cohortTable = cohortTable,
+                                  outcomeTable = outcomeTable,
+                                  sampleSize = sampleSize,
+                                  keepPrediction = keepPrediction,
+                                  recalibrate = recalibrate,
+                                  verbosity = verbosity)
+
+    }else{
+      ParallelLogger::logInfo("Applying Models in plp_models folder")
+      analysesLocation <- system.file("plp_models",
+                                      package = "SkeletonPredictionValidationStudy")
+      val <- PatientLevelPrediction::evaluateMultiplePlp(analysesLocation = analysesLocation,
+                                                         outputLocation = outputFolder,
+                                                         connectionDetails = connectionDetails,
+                                                         validationSchemaTarget = cohortDatabaseSchema,
+                                                         validationSchemaOutcome = outcomeDatabaseSchema,
+                                                         validationSchemaCdm = cdmDatabaseSchema,
+                                                         oracleTempSchema = oracleTempSchema,
+                                                         databaseNames = databaseName,
+                                                         validationTableTarget = cohortTable,
+                                                         validationTableOutcome = outcomeTable,
+                                                         sampleSize = sampleSize,
+                                                         keepPrediction = keepPrediction,
+                                                         recalibrate = recalibrate,
+                                                         verbosity = verbosity)
+    }
   }
 
   # package the results: this creates a compressed file with sensitive details removed - ready to be reviewed and then
