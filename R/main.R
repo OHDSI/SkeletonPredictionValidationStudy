@@ -73,20 +73,20 @@ execute <- function(connectionDetails,
     # if settings json is missing run old code
     if(settingsLocation != ""){
       ParallelLogger::logInfo("Executing Models Using Settings")
-      runModelsFromSetting(outputLocation = outputFolder,
-                                  connectionDetails = connectionDetails,
-                                  cohortDatabaseSchema = cohortDatabaseSchema,
-                                  outcomeDatabaseSchema = outcomeDatabaseSchema,
-                                  cdmDatabaseSchema = cdmDatabaseSchema,
-                           cdmVersion = cdmVersion,
-                                  oracleTempSchema = oracleTempSchema,
-                                  databaseName = databaseName,
-                                  cohortTable = cohortTable,
-                                  outcomeTable = outcomeTable,
-                                  sampleSize = sampleSize,
-                                  keepPrediction = keepPrediction,
-                                  recalibrate = recalibrate,
-                                  verbosity = verbosity)
+      runModelsFromJson(outputLocation = outputFolder,
+                        connectionDetails = connectionDetails,
+                        cohortDatabaseSchema = cohortDatabaseSchema,
+                        outcomeDatabaseSchema = outcomeDatabaseSchema,
+                        cdmDatabaseSchema = cdmDatabaseSchema,
+                        cdmVersion = cdmVersion,
+                        oracleTempSchema = oracleTempSchema,
+                        databaseName = databaseName,
+                        cohortTable = cohortTable,
+                        outcomeTable = outcomeTable,
+                        sampleSize = sampleSize,
+                        keepPrediction = keepPrediction,
+                        recalibrate = recalibrate,
+                        verbosity = verbosity)
 
     }else{
       ParallelLogger::logInfo("Applying Models in plp_models folder")

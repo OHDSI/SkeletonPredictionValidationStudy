@@ -59,7 +59,8 @@ predict.pythonJson <- function(plpModel, plpData, population){
                                             map = plpModel$covariateMap)
 
   #reticulate::conda_install(envname = 'r-reticulate', packages = 'sklearn-json')
-  skljson <- reticulate::import('sklearn_json')
+  skljson <- tryCatch({reticulate::import('sklearn_json')},
+                      error = function(e){ParallelLogger::logInfo("Need to run: reticulate::conda_install(envname = 'r-reticulate', packages = 'sklearn-json')")})
   modelTrained <- skljson$from_json(plpModel$model) # if adaBoost/Keras use different load
 
 

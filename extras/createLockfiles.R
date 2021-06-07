@@ -4,7 +4,7 @@
 
 OhdsiRTools::createRenvLockFile(rootPackage = "SkeletonPredictionValidationStudy",
                                 includeRootPackage = FALSE,
-                                additionalRequiredPackages = c("SparseM", "keras", "tensorflow", "plyr", "survAUC", "officer",
+                                additionalRequiredPackages = c( "keras", "tensorflow", "plyr", "survAUC", "officer",
                                                                "diagram", "xgboost", "DT", "shiny", "shinydashboard", "shinycssloaders",
                                                                "DT", "htmlwidgets", "shinyWidgets", "plotly"))
 

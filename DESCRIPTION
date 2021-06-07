@@ -8,20 +8,21 @@ Maintainer: your name <youremail@address>
 Description: A description of the study
 License: Apache License 2.0
 Depends:
-  R (>= 3.3.0), 
-  DatabaseConnector (>= 3.0.0)
+  R (>= 3.3.0)
 Imports:
-  FeatureExtraction (>= 3.0.0),
-  SqlRender,
+  Andromeda,
   Cyclops (>= 3.0.0),
-  PatientLevelPrediction (>= 4.0.0),
+  DatabaseConnector (>= 3.0.0),
+  dplyr,
+  FeatureExtraction (>= 3.0.0),
   ggplot2,
   gridExtra,
-  ParallelLogger (>= 2.0.0),
+  magrittr,
   OhdsiSharing,
-  Andromeda,
-  dplyr,
-  magrittr
+  ParallelLogger (>= 2.0.0),
+  PatientLevelPrediction (>= 4.0.0),
+  reticulate,
+  SqlRender
 Suggests:
   testthat
 NeedsCompilation: no
