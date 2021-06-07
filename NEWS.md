@@ -1,3 +1,7 @@
+SkeletonPredictionValidationStudy 1.0.4
+======================
+  - Added r and python environments
+
 SkeletonPredictionValidationStudy 1.0.3
 ======================
   - Added ability to run models saved as jsons
