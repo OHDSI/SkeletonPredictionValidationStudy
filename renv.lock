@@ -623,7 +623,7 @@
 		},
 		"zip" : {
 			"Package" : "zip",
-			"Version" : "2.0.4",
+			"Version" : "2.2.0",
 			"Source" : "Repository",
 			"Repository" : "CRAN"
 		},
@@ -979,13 +979,13 @@
 		},
 		"PatientLevelPrediction" : {
 			"Package" : "PatientLevelPrediction",
-			"Version" : "4.3.9",
+			"Version" : "4.3.10",
 			"Source" : "GitHub",
 			"RemoteType" : "github",
 			"RemoteHost" : "api.github.com",
 			"RemoteRepo" : "PatientLevelPrediction",
 			"RemoteUsername" : "ohdsi",
-			"RemoteRef" : "v4.3.9"
+			"RemoteRef" : "v4.3.10"
 		}
 	}
 }

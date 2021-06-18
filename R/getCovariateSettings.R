@@ -31,10 +31,10 @@ updateSettings <- function(covariateSettings,
 
       if(covariateSettings[[j]]$fnct == 'createCovariateSettings'){
         covariateSettings[[j]] <- covariateSettings[[j]]$settings
-        attr(covariateSettings[[j]], 'fun') <- covariateSettings[[j]]$settings$attr_fun
-        covariateSettings[[j]]$settings$attr_fun <- NULL
-        attr(covariateSettings[[j]], 'class') <- covariateSettings[[j]]$settings$attr_class
-        covariateSettings[[j]]$settings$attr_class <- NULL
+        attr(covariateSettings[[j]], 'fun') <- covariateSettings[[j]]$attr_fun
+        covariateSettings[[j]]$attr_fun <- NULL
+        attr(covariateSettings[[j]], 'class') <- covariateSettings[[j]]$attr_class
+        covariateSettings[[j]]$attr_class <- NULL
 
       }else{
         covariateSettings[[j]] <- do.call(get(covariateSettings[[j]]$fnct),
@@ -51,10 +51,10 @@ updateSettings <- function(covariateSettings,
 
     if(covariateSettings$fnct == 'createCovariateSettings'){
       covariateSettings <- covariateSettings$settings
-      attr(covariateSettings, 'fun') <- covariateSettings$settings$attr_fun
-      covariateSettings$settings$attr_fun <- NULL
-      attr(covariateSettings, 'class') <- covariateSettings$settings$attr_class
-      covariateSettings$settings$attr_class <- NULL
+      attr(covariateSettings, 'fun') <- covariateSettings$attr_fun
+      covariateSettings$attr_fun <- NULL
+      attr(covariateSettings, 'class') <- covariateSettings$attr_class
+      covariateSettings$attr_class <- NULL
 
     }else{
       covariateSettings <- do.call(get(covariateSettings$fnct),

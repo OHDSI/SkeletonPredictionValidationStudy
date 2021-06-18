@@ -39,7 +39,7 @@ packageResults <- function(outputFolder,
 
   if(length(folders)==0){
     stop('No results to export...')
-    }
+  }
 
   #create export subfolder in workFolder
   exportFolder <- file.path(outputFolder, "export")
@@ -57,6 +57,8 @@ packageResults <- function(outputFolder,
       if(minCellCount==0){
         minCellCount <- NULL
       }
+      cvst <- plpResult$inputSetting$dataExtrractionSettings$covariateSettings
+
       result <- PatientLevelPrediction::transportPlp(plpResult, save = F,
                                                      n=minCellCount,
                                                      includeEvaluationStatistics=T,
@@ -65,7 +67,12 @@ packageResults <- function(outputFolder,
                                                      includeCalibrationSummary =T,
                                                      includePredictionDistribution=T,
                                                      includeCovariateSummary=T)
-      saveRDS(result, file.path(exportFolder,folder, 'validationResult.rds'))
+
+      result$inputSetting$dataExtrractionSettings$covariateSettings <- cvst
+      if(!is.null(result$inputSetting$populationSettings$plpData)){
+        result$inputSetting$populationSettings$plpData <- NULL
+      }
+      PatientLevelPrediction::savePlpToCsv(result, file.path(exportFolder,folder))
 
     }
   }

@@ -58,13 +58,19 @@ predict.pythonJson <- function(plpModel, plpData, population){
                                             population = population,
                                             map = plpModel$covariateMap)
 
+  ParallelLogger::logInfo(paste0('Full data dimensions: ', nrow(data$data) ,',',ncol(data$data) ))
+
+  included <- plpModel$varImp$covariateId[plpModel$varImp$included>0] # does this include map?
+  included <- data$map$newCovariateId[data$map$oldCovariateId%in%included]
+
   #reticulate::conda_install(envname = 'r-reticulate', packages = 'sklearn-json')
   skljson <- tryCatch({reticulate::import('sklearn_json')},
                       error = function(e){ParallelLogger::logInfo("Need to run: reticulate::conda_install(envname = 'r-reticulate', packages = 'sklearn-json')")})
   modelTrained <- skljson$from_json(plpModel$model) # if adaBoost/Keras use different load
 
+  dataMat <- data$data[population$rowId,included, drop = F]
+  ParallelLogger::logInfo(paste0('Model data dimensions: ', nrow(dataMat) ,',',ncol(dataMat) ))
 
-  dataMat <- data$data[population$rowId,, drop = F]
   if(is.null(dim(dataMat))){
     ParallelLogger::logInfo('Converting dimensions')
     dataMat <- matrix(as.vector(data$data[population$rowId]), ncol = 1)

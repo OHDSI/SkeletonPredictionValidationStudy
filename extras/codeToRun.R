@@ -1,64 +1,73 @@
 library(SkeletonPredictionValidationStudy)
 
-# add details of your database setting:
-databaseName <- 'add a shareable name for the database you are currently validating on'
+# the location to save the models validation results to:
+outputFolder <- './Validation'
 
-# add the cdm database schema with the data
-cdmDatabaseSchema <- 'your cdm database schema for the validation'
-
-# add the work database schema this requires read/write privileges
-cohortDatabaseSchema <- 'your work database schema'
-
-# if using oracle please set the location of your temp schema
-oracleTempSchema <- NULL
-
-# the name of the table that will be created in cohortDatabaseSchema to hold the cohorts
-cohortTable <- 'SkeletonPredictionValidationStudyCohortTable'
-
-# the location to save the prediction models results to:
-outputFolder <- '../Validation'
-
-# add connection details:
-options(fftempdir = 'T:/fftemp')
-dbms <- "pdw"
-user <- NULL
-pw <- NULL
-server <- Sys.getenv('server')
-port <- Sys.getenv('port')
+# add the database connection details
+dbms = 'your database management system'
+server = 'your server'
+user = 'your username'
+password = 'top secret'
+port = 'your port'
 connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = dbms,
                                                                 server = server,
                                                                 user = user,
                                                                 password = pw,
                                                                 port = port)
 
+# add cdm database details:
+cdmDatabaseSchema <- 'your cdm database schema'
+
+# add a schema you have read/write access to
+# this is where the cohorts will be created (or are already created)
+cohortDatabaseSchema <- 'your cohort database schema'
+
+# if using oracle specify the temp schema
+oracleTempSchema <- NULL
+
+# Add a sharebale name for the database containing the OMOP CDM data
+databaseName <- 'your database name'
+
+# table name where the cohorts will be generated
+cohortTable <- 'SkeletonPredictionValidationStudyCohort'
+
+#===== execution choices =====
+
+# how much details do you want for in progress report?
+verbosity <- "INFO"
+
+# create the cohorts using the sql in the package?
+createCohorts = T
+
+# apply the models in the package to your data?
+runValidation = F
+# if you only want to apply models to a sample of
+# patients put the number as the sampleSize
+sampleSize = NULL
+# do you want to recalibrate results?
+# NULL means none (see ?SkeletonPredictionValidationStudy::execute for options)
+recalibrate <- NULL
+
+# extract the results to share as a zip file?
+packageResults = T
+# when extracting results - what is the min cell count?
+minCellCount = 5
+
+#=============================
+
 # Now run the study
 SkeletonPredictionValidationStudy::execute(connectionDetails = connectionDetails,
-                                 databaseName = databaseName,
-                                 cdmDatabaseSchema = cdmDatabaseSchema,
-                                 cohortDatabaseSchema = cohortDatabaseSchema,
-                                 oracleTempSchema = oracleTempSchema,
-                                 cohortTable = cohortTable,
-                                 outputFolder = outputFolder,
-                                 createCohorts = T,
-                                 runValidation = T,
-                                 packageResults = F,
-                                 minCellCount = 5,
-                                 sampleSize = NULL)
-# the results will be saved to outputFolder.  If you set this to the
-# predictionStudyResults/Validation package then the validation results
-# will be accessible to the shiny viewer
-
-# to package the results run (run after the validation results are complete):
-# NOTE: the minCellCount = N will remove any result with N patients or less
-SkeletonPredictionValidationStudy::execute(connectionDetails = connectionDetails,
-                                 databaseName = databaseName,
-                                 cdmDatabaseSchema = cdmDatabaseSchema,
-                                 cohortDatabaseSchema = cohortDatabaseSchema,
-                                 oracleTempSchema = oracleTempSchema,
-                                 cohortTable = cohortTable,
-                                 outputFolder = outputFolder,
-                                 createCohorts = F,
-                                 runValidation = F,
-                                 packageResults = T,
-                                 minCellCount = 5,
-                                 sampleSize = NULL)
+                                           databaseName = databaseName,
+                                           cdmVersion = 5,
+                                           cdmDatabaseSchema = cdmDatabaseSchema,
+                                           cohortDatabaseSchema = cohortDatabaseSchema,
+                                           oracleTempSchema = oracleTempSchema,
+                                           cohortTable = cohortTable,
+                                           outputFolder = outputFolder,
+                                           createCohorts = createCohorts,
+                                           recalibrate = recalibrate,
+                                           runValidation = runValidation,
+                                           packageResults = packageResults,
+                                           minCellCount = minCellCount,
+                                           sampleSize = sampleSize,
+                                           verbosity = verbosity)

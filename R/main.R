@@ -48,10 +48,12 @@ execute <- function(connectionDetails,
                     keepPrediction = T,
                     verbosity = 'INFO'){
 
-  if (!file.exists(outputFolder))
-    dir.create(outputFolder, recursive = TRUE)
+  if (!file.exists(file.path(outputFolder,databaseName))){
+    dir.create(file.path(outputFolder,databaseName), recursive = TRUE)
+  }
 
   ParallelLogger::addDefaultFileLogger(file.path(outputFolder,databaseName, "log.txt"))
+
 
   if(createCohorts){
     ParallelLogger::logInfo("Creating Cohorts")
@@ -73,14 +75,14 @@ execute <- function(connectionDetails,
     # if settings json is missing run old code
     if(settingsLocation != ""){
       ParallelLogger::logInfo("Executing Models Using Settings")
-      runModelsFromJson(outputLocation = outputFolder,
+      runModelsFromJson(outputFolder = outputFolder,
                         connectionDetails = connectionDetails,
                         cohortDatabaseSchema = cohortDatabaseSchema,
                         outcomeDatabaseSchema = outcomeDatabaseSchema,
                         cdmDatabaseSchema = cdmDatabaseSchema,
                         cdmVersion = cdmVersion,
                         oracleTempSchema = oracleTempSchema,
-                        databaseName = databaseName,
+                        cdmDatabaseName = databaseName,
                         cohortTable = cohortTable,
                         outcomeTable = outcomeTable,
                         sampleSize = sampleSize,
