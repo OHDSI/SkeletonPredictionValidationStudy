@@ -110,13 +110,16 @@ getCohortCovariateData <- function(connection,
                             endDay = 0,
                             isBinary = "Y",
                             missingMeansZero = "Y")
-  
+
   metaData <- list(sql = sql, call = match.call())
+
   result <- Andromeda::andromeda(covariates = covariates,
                                  covariateRef = covariateRef,
                                  analysisRef = analysisRef)
   attr(result, "metaData") <- metaData
+
   class(result) <- "CovariateData"	
+
   return(result)
 }
 
