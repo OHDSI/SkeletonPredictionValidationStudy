@@ -11,6 +11,7 @@
 #' @param cdmDatabaseSchema    Schema name where your patient-level data in OMOP CDM format resides.
 #'                             Note that for SQL Server, this should include both the database and
 #'                             schema name, for example 'cdm_data.dbo'.
+#' @param cdmVersion           CDM version
 #' @param cohortDatabaseSchema Schema name where intermediate data can be stored. You will need to have
 #'                             write priviliges in this schema. Note that for SQL Server, this should
 #'                             include both the database and schema name, for example 'cdm_data.dbo'.
@@ -19,6 +20,7 @@
 #' @param cohortTable          The name of the table that will be created in the work database schema.
 #'                             This table will hold the exposure and outcome cohorts used in this
 #'                             study.
+#' @param recalibrate          Whether to recalibrate ('recalibrationintheLarge' and/or 'weakRecalibration')
 #' @param outputFolder         Name of local folder to place results; make sure to use forward slashes
 #'                             (/)
 #' @param createCohorts        Whether to create the cohorts for the study
@@ -32,11 +34,13 @@
 execute <- function(connectionDetails,
                     databaseName,
                     cdmDatabaseSchema,
+                    cdmVersion,
                     cohortDatabaseSchema,
                     oracleTempSchema,
                     cohortTable,
                     outputFolder,
                     createCohorts = T,
+                    recalibrate = NULL,
                     runValidation = T,
                     packageResults = T,
                     minCellCount = 5,
@@ -44,10 +48,12 @@ execute <- function(connectionDetails,
                     keepPrediction = T,
                     verbosity = 'INFO'){
 
-  if (!file.exists(outputFolder))
-    dir.create(outputFolder, recursive = TRUE)
+  if (!file.exists(file.path(outputFolder,databaseName))){
+    dir.create(file.path(outputFolder,databaseName), recursive = TRUE)
+  }
 
   ParallelLogger::addDefaultFileLogger(file.path(outputFolder,databaseName, "log.txt"))
+
 
   if(createCohorts){
     ParallelLogger::logInfo("Creating Cohorts")
@@ -62,21 +68,47 @@ execute <- function(connectionDetails,
   if(runValidation){
     ParallelLogger::logInfo("Validating Models")
     # for each model externally validate
-    analysesLocation <- system.file("plp_models",
+
+    settingsLocation <- system.file("models",
                                     package = "SkeletonPredictionValidationStudy")
-    val <- PatientLevelPrediction::evaluateMultiplePlp(analysesLocation = analysesLocation,
-                                                       outputLocation = outputFolder,
-                                                       connectionDetails = connectionDetails,
-                                                       validationSchemaTarget = cohortDatabaseSchema,
-                                                       validationSchemaOutcome = cohortDatabaseSchema,
-                                                       validationSchemaCdm = cdmDatabaseSchema,
-                                                       oracleTempSchema = oracleTempSchema,
-                                                       databaseNames = databaseName,
-                                                       validationTableTarget = cohortTable,
-                                                       validationTableOutcome = cohortTable,
-                                                       sampleSize = sampleSize,
-                                                       keepPrediction = keepPrediction,
-                                                       verbosity = verbosity)
+
+    # if settings json is missing run old code
+    if(settingsLocation != ""){
+      ParallelLogger::logInfo("Executing Models Using Settings")
+      runModelsFromJson(outputFolder = outputFolder,
+                        connectionDetails = connectionDetails,
+                        cohortDatabaseSchema = cohortDatabaseSchema,
+                        outcomeDatabaseSchema = cohortDatabaseSchema,
+                        cdmDatabaseSchema = cdmDatabaseSchema,
+                        cdmVersion = cdmVersion,
+                        oracleTempSchema = oracleTempSchema,
+                        cdmDatabaseName = databaseName,
+                        cohortTable = cohortTable,
+                        outcomeTable = cohortTable,
+                        sampleSize = sampleSize,
+                        keepPrediction = keepPrediction,
+                        recalibrate = recalibrate,
+                        verbosity = verbosity)
+
+    }else{
+      ParallelLogger::logInfo("Applying Models in plp_models folder")
+      analysesLocation <- system.file("plp_models",
+                                      package = "SkeletonPredictionValidationStudy")
+      val <- PatientLevelPrediction::evaluateMultiplePlp(analysesLocation = analysesLocation,
+                                                         outputLocation = outputFolder,
+                                                         connectionDetails = connectionDetails,
+                                                         validationSchemaTarget = cohortDatabaseSchema,
+                                                         validationSchemaOutcome = cohortDatabaseSchema,
+                                                         validationSchemaCdm = cdmDatabaseSchema,
+                                                         oracleTempSchema = oracleTempSchema,
+                                                         databaseNames = databaseName,
+                                                         validationTableTarget = cohortTable,
+                                                         validationTableOutcome = cohortTable,
+                                                         sampleSize = sampleSize,
+                                                         keepPrediction = keepPrediction,
+                                                         recalibrate = recalibrate,
+                                                         verbosity = verbosity)
+    }
   }
 
   # package the results: this creates a compressed file with sensitive details removed - ready to be reviewed and then

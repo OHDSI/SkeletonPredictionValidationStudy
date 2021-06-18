@@ -43,19 +43,25 @@ getCohortCovariateData <- function(connection,
                                    aggregated,
                                    cohortId,
                                    covariateSettings) {
-
+  
+  
+  
   # Some SQL to construct the covariate:
   sql <- paste(
-    "select a.@row_id_field AS row_id, @covariate_id AS covariate_id,
-    {@countval}?{count(distinct b.cohort_start_date)}:{max(1)} as covariate_value",
+    "select a.@row_id_field AS row_id, @covariate_id AS covariate_id,",
+    "{@lnAgeInteraction}?{LOG(max(YEAR(a.cohort_start_date)-p.year_of_birth))}:{",
+     "{@ageInteraction}?{max(YEAR(a.cohort_start_date)-p.year_of_birth)}:{",
+     "{@countval}?{count(distinct b.cohort_start_date)}:{max(1)}",
+     "}} as covariate_value",
     "from @cohort_temp_table a inner join @covariate_cohort_schema.@covariate_cohort_table b",
     " on a.subject_id = b.subject_id and ",
 	" b.cohort_start_date <= dateadd(day, @endDay, a.cohort_start_date) and ",
     " b.cohort_end_date >= dateadd(day, @startDay, a.cohort_start_date) ",
+	"{@ageInteraction | @lnAgeInteraction}?{inner join @cdm_database_schema.person p on p.person_id=a.subject_id}",
     "where b.cohort_definition_id = @covariate_cohort_id
     group by a.@row_id_field "
   )
-
+  
   sql <- SqlRender::render(sql,
                            covariate_cohort_schema = covariateSettings$cohortDatabaseSchema,
                            covariate_cohort_table = covariateSettings$cohortTable,
@@ -65,7 +71,10 @@ getCohortCovariateData <- function(connection,
                            startDay=covariateSettings$startDay,
                            covariate_id = covariateSettings$covariateId,
                            endDay=covariateSettings$endDay,
-                           countval = covariateSettings$count)
+                           countval = covariateSettings$count,
+                           ageInteraction = covariateSettings$ageInteraction,
+                           lnAgeInteraction = covariateSettings$lnAgeInteraction,
+                           cdm_database_schema = cdmDatabaseSchema)
   sql <- SqlRender::translate(sql, targetDialect = attr(connection, "dbms"),
                               oracleTempSchema = oracleTempSchema)
   # Retrieve the covariate:
@@ -74,16 +83,27 @@ getCohortCovariateData <- function(connection,
   colnames(covariates) <- SqlRender::snakeCaseToCamelCase(colnames(covariates))
   # Construct covariate reference:
   sql <- "select @covariate_id as covariate_id, '@concept_set' as covariate_name,
-  456 as analysis_id, -1 as concept_id"
+  @analysis_id as analysis_id, -1 as concept_id"
   sql <- SqlRender::render(sql, covariate_id = covariateSettings$covariateId,
-                           concept_set=paste(covariateSettings$covariateName,' days before:', covariateSettings$startDay, 'days after:', covariateSettings$endDay))
+                           analysis_id = covariateSettings$analysisId,
+                           concept_set=paste('Cohort_covariate during day',
+                                             covariateSettings$startDay,
+                                             'through',
+                                             covariateSettings$endDay,
+                                             'days relative to index:',
+                                             ifelse(covariateSettings$count, 'Number of', ''),
+                                             covariateSettings$covariateName,
+                                             ifelse(covariateSettings$ageInteraction, ' X Age', ''),
+                                             ifelse(covariateSettings$lnAgeInteraction, ' X ln(Age)', '')
+                             ))
+  
   sql <- SqlRender::translate(sql, targetDialect = attr(connection, "dbms"),
                               oracleTempSchema = oracleTempSchema)
   # Retrieve the covariateRef:
   covariateRef  <- DatabaseConnector::querySql(connection, sql)
   colnames(covariateRef) <- SqlRender::snakeCaseToCamelCase(colnames(covariateRef))
-
-  analysisRef <- data.frame(analysisId = 456,
+  
+  analysisRef <- data.frame(analysisId = covariateSettings$analysisId,
                             analysisName = "cohort covariate",
                             domainId = "cohort covariate",
                             startDay = 0,
@@ -92,28 +112,35 @@ getCohortCovariateData <- function(connection,
                             missingMeansZero = "Y")
 
   metaData <- list(sql = sql, call = match.call())
-	
+
   result <- Andromeda::andromeda(covariates = covariates,
                                  covariateRef = covariateRef,
                                  analysisRef = analysisRef)
   attr(result, "metaData") <- metaData
-  class(result) <- "CovariateData"
+
+  class(result) <- "CovariateData"	
+
   return(result)
 }
 
 
 createCohortCovariateSettings <- function(covariateName, covariateId,
                                           cohortDatabaseSchema, cohortTable, cohortId,
-                                          startDay=-30, endDay=0, count=T) {
+                                          startDay=-30, endDay=0, count=F, 
+                                          ageInteraction = F, lnAgeInteraction= F,
+                                          analysisId = 456) {
   covariateSettings <- list(covariateName=covariateName, covariateId=covariateId,
                             cohortDatabaseSchema=cohortDatabaseSchema,
                             cohortTable=cohortTable,
                             cohortId=cohortId,
                             startDay=startDay,
                             endDay=endDay,
-                            count=count)
-
-  attr(covariateSettings, "fun") <- "getCohortCovariateData"
+                            count=count,
+                            ageInteraction=ageInteraction,
+                            lnAgeInteraction = lnAgeInteraction,
+                            analysisId = analysisId)
+  
+  attr(covariateSettings, "fun") <- "SkeletonPredictionValidationStudy::getCohortCovariateData"
   class(covariateSettings) <- "covariateSettings"
   return(covariateSettings)
 }

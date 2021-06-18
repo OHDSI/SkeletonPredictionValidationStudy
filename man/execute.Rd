@@ -8,11 +8,13 @@ execute(
   connectionDetails,
   databaseName,
   cdmDatabaseSchema,
+  cdmVersion,
   cohortDatabaseSchema,
   oracleTempSchema,
   cohortTable,
   outputFolder,
   createCohorts = T,
+  recalibrate = NULL,
   runValidation = T,
   packageResults = T,
   minCellCount = 5,
@@ -32,6 +34,8 @@ DatabaseConnector package.}
 Note that for SQL Server, this should include both the database and
 schema name, for example 'cdm_data.dbo'.}
 
+\item{cdmVersion}{CDM version}
+
 \item{cohortDatabaseSchema}{Schema name where intermediate data can be stored. You will need to have
 write priviliges in this schema. Note that for SQL Server, this should
 include both the database and schema name, for example 'cdm_data.dbo'.}
@@ -47,6 +51,8 @@ study.}
 (/)}
 
 \item{createCohorts}{Whether to create the cohorts for the study}
+
+\item{recalibrate}{Whether to recalibrate ('recalibrationintheLarge' and/or 'weakRecalibration')}
 
 \item{runValidation}{Whether to run the valdiation models}
 

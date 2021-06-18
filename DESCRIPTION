@@ -1,27 +1,34 @@
 Package: SkeletonPredictionValidationStudy
 Type: Package
 Title: Add the title of the package here
-Version: 1.0.0
-Date: 2020-03-14
+Version: 1.0.4
+Date: 2021-06-07
 Author: your name [aut]
 Maintainer: your name <youremail@address>
-Description: A description of the study
+Description: Write your study package description here.
 License: Apache License 2.0
 Depends:
-  R (>= 3.3.0), 
-  DatabaseConnector (>= 3.0.0)
+  R (>= 3.3.0)
 Imports:
-  FeatureExtraction (>= 3.0.0),
-  SqlRender,
+  Andromeda,
   Cyclops (>= 3.0.0),
-  PatientLevelPrediction (>= 4.0.0),
+  DatabaseConnector (>= 3.0.0),
+  dplyr,
+  FeatureExtraction (>= 3.0.0),
   ggplot2,
   gridExtra,
-  ParallelLogger (>= 2.0.0),
+  Hydra,
+  magrittr,
   OhdsiSharing,
-  Andromeda,
-  dplyr
+  ParallelLogger (>= 2.0.0),
+  PatientLevelPrediction (>= 4.0.0),
+  reticulate,
+  RJSONIO,
+  rlang,
+  SqlRender,
+  stats,
+  xgboost
 Suggests:
   testthat
 NeedsCompilation: no
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.1

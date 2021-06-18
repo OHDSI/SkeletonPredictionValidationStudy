@@ -18,7 +18,11 @@
 
 #' SkeletonPredictionValidationStudy
 #'
+#' @description A package for validating prediction models using data in the OMOP CDM
+#'
 #' @docType package
 #' @name SkeletonPredictionValidationStudy
 #' @import DatabaseConnector
+#' @importFrom magrittr %>%
+#' @importFrom rlang .data
 NULL

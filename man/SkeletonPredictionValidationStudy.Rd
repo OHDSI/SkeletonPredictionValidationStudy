@@ -5,5 +5,5 @@
 \alias{SkeletonPredictionValidationStudy}
 \title{SkeletonPredictionValidationStudy}
 \description{
-SkeletonPredictionValidationStudy
+A package for validating prediction models using data in the OMOP CDM
 }
