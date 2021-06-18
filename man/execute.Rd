@@ -8,6 +8,7 @@ execute(
   connectionDetails,
   databaseName,
   cdmDatabaseSchema,
+  cdmVersion,
   cohortDatabaseSchema,
   oracleTempSchema,
   cohortTable,
@@ -32,6 +33,8 @@ DatabaseConnector package.}
 \item{cdmDatabaseSchema}{Schema name where your patient-level data in OMOP CDM format resides.
 Note that for SQL Server, this should include both the database and
 schema name, for example 'cdm_data.dbo'.}
+
+\item{cdmVersion}{CDM version}
 
 \item{cohortDatabaseSchema}{Schema name where intermediate data can be stored. You will need to have
 write priviliges in this schema. Note that for SQL Server, this should

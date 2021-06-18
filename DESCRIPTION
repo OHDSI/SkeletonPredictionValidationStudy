@@ -5,7 +5,7 @@ Version: 1.0.4
 Date: 2021-06-07
 Author: your name [aut]
 Maintainer: your name <youremail@address>
-Description: A description of the study
+Description: Write your study package description here.
 License: Apache License 2.0
 Depends:
   R (>= 3.3.0)
@@ -17,12 +17,17 @@ Imports:
   FeatureExtraction (>= 3.0.0),
   ggplot2,
   gridExtra,
+  Hydra,
   magrittr,
   OhdsiSharing,
   ParallelLogger (>= 2.0.0),
   PatientLevelPrediction (>= 4.0.0),
   reticulate,
-  SqlRender
+  RJSONIO,
+  rlang,
+  SqlRender,
+  stats,
+  xgboost
 Suggests:
   testthat
 NeedsCompilation: no

@@ -42,9 +42,9 @@ getMeasurementCovariateData <- function(connection,
                                    aggregated,
                                    cohortId,
                                    covariateSettings) {
-  
+
   # to get table 1 - take source values and then map them - dont map in SQL
-  
+
   # Some SQL to construct the covariate:
   sql <- paste("select c.@row_id_field AS row_id, measurement_concept_id, unit_concept_id,",
                "{@lnAgeInteraction}?{LOG(YEAR(c.cohort_start_date)-p.year_of_birth)*}:{{@ageInteraction}?{(YEAR(c.cohort_start_date)-p.year_of_birth)*}}",
@@ -56,7 +56,7 @@ getMeasurementCovariateData <- function(connection,
                "inner join @cdm_database_schema.person p on p.person_id=c.subject_id",
                "where m.measurement_concept_id in (@concepts) {@lnValue}?{ and value_as_number >0 }"
   )
-  
+
   sql <- SqlRender::render(sql,
                            cohort_temp_table = cohortTable,
                            row_id_field = rowIdField,
@@ -78,57 +78,57 @@ getMeasurementCovariateData <- function(connection,
   # map data:
   covariates <- covariates[!is.na(covariates$valueAsNumber),]
   covariates <- covariateSettings$scaleMap(covariates)
-  
+
   # aggregate data:
   if(covariateSettings$aggregateMethod == 'max'){
-    covariates <- covariates %>% dplyr::group_by(rowId) %>%
-    dplyr::summarize(covariateValue = max(valueAsNumber),
-                     covariateValueSource = max(rawValue))
+    covariates <- covariates %>% dplyr::group_by(.data$rowId) %>%
+    dplyr::summarize(covariateValue = max(.data$valueAsNumber),
+                     covariateValueSource = max(.data$rawValue))
   } else if(covariateSettings$aggregateMethod == 'min'){
-    covariates <- covariates %>% dplyr::group_by(rowId) %>%
-      dplyr::summarize(covariateValue = min(valueAsNumber),
-                       covariateValueSource = min(rawValue))
+    covariates <- covariates %>% dplyr::group_by(.data$rowId) %>%
+      dplyr::summarize(covariateValue = min(.data$valueAsNumber),
+                       covariateValueSource = min(.data$rawValue))
   } else if(covariateSettings$aggregateMethod == 'mean'){
-     covariates <- covariates %>% dplyr::group_by(rowId) %>%
-      dplyr::summarize(covariateValue = mean(valueAsNumber),
-                       covariateValueSource = mean(rawValue))
+     covariates <- covariates %>% dplyr::group_by(.data$rowId) %>%
+      dplyr::summarize(covariateValue = mean(.data$valueAsNumber),
+                       covariateValueSource = mean(.data$rawValue))
   } else if(covariateSettings$aggregateMethod == 'median'){
-    covariates <- covariates %>% dplyr::group_by(rowId) %>%
-      dplyr::summarize(covariateValue = median(valueAsNumber),
-                       covariateValueSource = median(rawValue))
+    covariates <- covariates %>% dplyr::group_by(.data$rowId) %>%
+      dplyr::summarize(covariateValue = stats::median(.data$valueAsNumber),
+                       covariateValueSource = stats::median(.data$rawValue))
   } else{
-    last <- covariates %>% dplyr::group_by(rowId) %>%
-      dplyr::summarize(lastTime = min(indexTime))
-    covariates <- merge(covariates,last, 
-          by.x = c('rowId','indexTime'), 
+    last <- covariates %>% dplyr::group_by(.data$rowId) %>%
+      dplyr::summarize(lastTime = min(.data$indexTime))
+    covariates <- merge(covariates,last,
+          by.x = c('rowId','indexTime'),
           by.y = c('rowId','lastTime') )
-    
-    covariates <- covariates %>% dplyr::group_by(rowId) %>%
-      dplyr::summarize(covariateValue = mean(valueAsNumber),
-                       covariateValueSource = mean(rawValue))
+
+    covariates <- covariates %>% dplyr::group_by(.data$rowId) %>%
+      dplyr::summarize(covariateValue = mean(.data$valueAsNumber),
+                       covariateValueSource = mean(.data$rawValue))
   }
-  
+
   # add covariateID:
   covariates$covariateId <- covariateSettings$covariateId
-  
+
   #=================
   # CALCULATE TABLE 1 Measurement info
-  table1 <- covariates %>% dplyr::group_by(covariateId) %>%
-    dplyr::summarize(meanValue = mean(covariateValueSource), 
-                     sdValue = sd(covariateValueSource),
-                     count = length(covariateValueSource))
+  table1 <- covariates %>% dplyr::group_by(.data$covariateId) %>%
+    dplyr::summarize(meanValue = mean(.data$covariateValueSource),
+                     sdValue = stats::sd(.data$covariateValueSource),
+                     count = length(.data$covariateValueSource))
   table1 <- as.data.frame(table1)
-  
-  covariates <- covariates %>% dplyr::select(rowId, covariateId, covariateValue)
+
+  covariates <- covariates %>% dplyr::select(.data$rowId, .data$covariateId, .data$covariateValue)
   #=================
-  
-  
+
+
   # impute missing - add age here to be able to input age interaction
   sql <- paste("select distinct c.@row_id_field AS row_id ",
                ", YEAR(c.cohort_start_date)-p.year_of_birth  as age",
                 "from @cohort_temp_table c",
                "inner join @cdm_database_schema.person p on p.person_id=c.subject_id")
-  
+
   sql <- SqlRender::render(sql, cohort_temp_table = cohortTable,
                            row_id_field = rowIdField,
                            cdm_database_schema = cdmDatabaseSchema)
@@ -137,15 +137,15 @@ getMeasurementCovariateData <- function(connection,
   # Retrieve the covariate:
   ppl <- DatabaseConnector::querySql(connection, sql)
   colnames(ppl) <- SqlRender::snakeCaseToCamelCase(colnames(ppl))
-  
-  
+
+
   missingPlp <- ppl[!ppl$rowId%in%covariates$rowId,]
   if(length(missingPlp$rowId)>0){
-    
+
     if(covariateSettings$lnValue){
       covariateSettings$imputationValue <- log(covariateSettings$imputationValue)
     }
-    
+
     if(covariateSettings$ageInteraction){
       covVal <- missingPlp$age*covariateSettings$imputationValue
     } else if(covariateSettings$lnAgeInteraction){
@@ -153,14 +153,14 @@ getMeasurementCovariateData <- function(connection,
     } else{
       covVal <- covariateSettings$imputationValue
     }
-    
-    extraData <- data.frame(rowId = missingPlp$rowId, 
-                            covariateId = covariateSettings$covariateId, 
+
+    extraData <- data.frame(rowId = missingPlp$rowId,
+                            covariateId = covariateSettings$covariateId,
                             covariateValue = covVal)
     covariates <- rbind(covariates, extraData[,colnames(covariates)])
   }
-  
-  
+
+
   # Construct covariate reference:
   covariateRef <- data.frame(covariateId = covariateSettings$covariateId,
                              covariateName = paste('Measurement during day',
@@ -176,7 +176,7 @@ getMeasurementCovariateData <- function(connection,
                              ),
                              analysisId = covariateSettings$analysisId,
                              conceptId = 0)
-  
+
   analysisRef <- data.frame(analysisId = covariateSettings$analysisId,
                             analysisName = "measurement covariate",
                             domainId = "measurement covariate",
@@ -184,19 +184,19 @@ getMeasurementCovariateData <- function(connection,
                             endDay = covariateSettings$endDay,
                             isBinary = "N",
                             missingMeansZero = "Y")
-  
+
   metaData <- list(sql = sql, call = match.call(), table1 = table1)
   result <- Andromeda::andromeda(covariates = covariates,
                                  covariateRef = covariateRef,
                                  analysisRef = analysisRef)
   attr(result, "metaData") <- metaData
-  class(result) <- "CovariateData"	
+  class(result) <- "CovariateData"
   return(result)
 }
 
 
 createMeasurementCovariateSettings <- function(covariateName, conceptSet,
-                                          startDay=-30, endDay=0, 
+                                          startDay=-30, endDay=0,
                                           scaleMap = NULL, aggregateMethod = 'recent',
                                           imputationValue = 0,
                                           ageInteraction = F,
@@ -205,8 +205,8 @@ createMeasurementCovariateSettings <- function(covariateName, conceptSet,
                                           covariateId = 1466,
                                           analysisId = 466
                                           ) {
-  
-  covariateSettings <- list(covariateName=covariateName, 
+
+  covariateSettings <- list(covariateName=covariateName,
                             conceptSet=conceptSet,
                             startDay=startDay,
                             endDay=endDay,
@@ -219,7 +219,7 @@ createMeasurementCovariateSettings <- function(covariateName, conceptSet,
                             covariateId = covariateId,
                             analysisId = analysisId
                             )
-  
+
   attr(covariateSettings, "fun") <- "SkeletonPredictionValidationStudy::getMeasurementCovariateData"
   class(covariateSettings) <- "covariateSettings"
   return(covariateSettings)

@@ -37,9 +37,9 @@ fromModelJson <- function(modelSettings,modelLoc){
   }
 
   plpModel <- editPreprocessing(modelSettings$settings)
-  plpModel$covariateMap <- tryCatch({read.csv(cvMapLocation)},
+  plpModel$covariateMap <- tryCatch({utils::read.csv(cvMapLocation)},
                                     error = function(e){return(NULL)})
-  plpModel$varImp <- tryCatch({read.csv(varImpLocation)},
+  plpModel$varImp <- tryCatch({utils::read.csv(varImpLocation)},
                               error = function(e){return(NULL)})
 
 

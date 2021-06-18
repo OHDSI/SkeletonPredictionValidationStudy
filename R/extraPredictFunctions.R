@@ -1,5 +1,19 @@
 # add the functions for the exisitng models here
 #======= add custom function here...
+
+
+#' Prediction for existing GLM
+#'
+#' @details
+#' This applies the existing models and calcualtes the risk for a population
+#'
+#' @param plpModel The model being applied
+#' @param plpData  The new data
+#' @param population The new population
+#'
+#' @return
+#' The population with an extra column 'value' corresponding to the patients risk
+#'
 #' @export
 predict.nonPlpGlm <- function(plpModel, plpData, population){
 
@@ -17,18 +31,18 @@ predict.nonPlpGlm <- function(plpModel, plpData, population){
   if(sum(c('power','offset')%in%colnames(coeff))==2){
     prediction <- plpData$covariateData$covariates %>%
       dplyr::inner_join(plpData$covariateData$coefficients, by= 'covariateId') %>%
-      dplyr::mutate(values = (covariateValue-offset)^power*points) %>%
-      dplyr::group_by(rowId) %>%
-      dplyr::summarise(value = sum(values, na.rm = TRUE)) %>%
-      dplyr::select(rowId, value) %>%
+      dplyr::mutate(values = (.data$covariateValue-.data$offset)^.data$power*.data$points) %>%
+      dplyr::group_by(.data$rowId) %>%
+      dplyr::summarise(value = sum(.data$values, na.rm = TRUE)) %>%
+      dplyr::select(.data$rowId, .data$value) %>%
       dplyr::collect()
   } else{
     prediction <- plpData$covariateData$covariates %>%
       dplyr::inner_join(plpData$covariateData$coefficients, by= 'covariateId') %>%
-      dplyr::mutate(values = covariateValue*points) %>%
-      dplyr::group_by(rowId) %>%
-      dplyr::summarise(value = sum(values, na.rm = TRUE)) %>%
-      dplyr::select(rowId, value) %>%
+      dplyr::mutate(values = .data$covariateValue*.data$points) %>%
+      dplyr::group_by(.data$rowId) %>%
+      dplyr::summarise(value = sum(.data$values, na.rm = TRUE)) %>%
+      dplyr::select(.data$rowId, .data$value) %>%
       dplyr::collect()
   }
 
@@ -51,6 +65,18 @@ predict.nonPlpGlm <- function(plpModel, plpData, population){
   return(prediction)
 }
 
+#' Prediction for python models saved as json objects
+#'
+#' @details
+#' This applies the existing models and calculates the risk for a population
+#'
+#' @param plpModel The model being applied
+#' @param plpData  The new data
+#' @param population The new population
+#'
+#' @return
+#' The population with an extra column 'value' corresponding to the patients risk
+#'
 #' @export
 predict.pythonJson <- function(plpModel, plpData, population){
 
