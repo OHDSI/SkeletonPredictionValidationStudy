@@ -7,7 +7,8 @@ loadModelFromJson <- function(jsonSettings,
 
   if(modelSettings$attr_type %in% c("pythonJson",
                                     'xgboost',
-                                    'plp')){
+                                    'plp',
+                                   'nonPlpGlm')){
 
     plpModel <- fromModelJson(modelSettings, modelLoc = modelLoc)
   } else{

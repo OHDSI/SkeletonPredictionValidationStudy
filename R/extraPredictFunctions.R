@@ -107,7 +107,9 @@ predict.pythonJson <- function(plpModel, plpData, population){
   prediction <- cbind(population, pred[,2])
   colnames(prediction)[ncol(prediction)] <- 'value'
 
-  metaData <- list(predictionType = 'pythonJson',
+  metaData <- list(predictionType = attr(plpModel, 'predictionType'),
+                   type = attr(plpModel, 'type'),
+                   pythonJson = T,
                    cohortId = attr(population,'metaData')$cohortId,
                    outcomeId = attr(population,'metaData')$outcomeId,
                    timepoint = attr(population,'metaData')$riskWindowEnd)
