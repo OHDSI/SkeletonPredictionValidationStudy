@@ -1,0 +1,54 @@
+
+#' Updates the package with the latest skeleton features
+#'
+#' @details
+#' Fetches the latest feature and changes to the skeleton to update the existing
+#' package.
+#'
+updatePackageVersion <- function() {
+
+  # Get the skeleton version of the current package. The skeleton version is
+  # stored in the SkeletonNote field in the DESCRIPTION file.
+  skeletonVersion <- packageDescription(
+    pkg = "SkeletonPredictionValidationStudy",
+    lib.loc = NULL,
+    fields = "SkeletonNote")
+
+  # Get the name of the package that is to be updated to rename the new skeleton
+  # files accordingly.
+  packageName <- packageDescription(
+    pkg = "SkeletonPredictionValidationStudy",
+    lib.loc = NULL,
+    fields = "Package"
+  )
+
+  # Download the latest skeleton to a temporary location
+  source("extras/skeletonHelpers.R")
+  packageLocation <- downLoadSkeleton(outputFolder = tempdir(),
+                                      packageName = packageName,
+                                      skeletonType = 'SkeletonPredictionValidationStudy')
+
+  # Read the version number of the latest skeleton
+  latestSkeletonVersion <- packageDescription('SkeletonPredictionValidationStudy',
+                                              lib.loc = tempdir(),
+                                              fields = "Version")
+
+  # If a new version is available?
+  if (compareVersion(skeletonVersion, latestSkeletonVersion) == 0) {
+    print("Package skeleton is up-to-date.")
+  } else if (compareVersion(skeletonVersion, latestSkeletonVersion) == -1) {
+    print(paste0("Your current version is ", skeletonVersion, " and version ",
+                 latestSkeletonVersion, " is available. Updating.."))
+
+    # Copy latest files from R folder to project
+    file.copy(dir(file.path(packageLocation, "R")), file.path(getwd(), "R"),
+              recursive = TRUE, overwrite = TRUE)
+
+    # Update skeleton version number in DESCRIPTION file
+    desc::desc_set(SkeletonNote = latestSkeletonVersion)
+    print("Update successful")
+  } else {
+    # do nothing
+  }
+  # if (latestSkeletonVersion > skeletonVersion)
+}
