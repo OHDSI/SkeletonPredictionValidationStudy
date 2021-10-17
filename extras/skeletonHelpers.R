@@ -4,7 +4,7 @@
 # on the GitHub repository of interest
 downLoadSkeleton <- function(outputFolder,
                              packageName,
-                             skeletonType = 'SkeletonPredictionStudy'){
+                             skeletonType = 'SkeletonPredictionValidationStudy'){
   # check outputFolder exists
 
   # check file.path(outputFolder,  packageName) does not exist
@@ -106,4 +106,10 @@ saveCohorts <- function(packageLocation,
   })
 
   return(packageLocation)
+}
+
+getLatestSkeletonVersion <- function(dir) {
+  packageDescription('SkeletonPredictionValidationStudy',
+                     lib.loc = dir,
+                     fields = "Version")
 }
