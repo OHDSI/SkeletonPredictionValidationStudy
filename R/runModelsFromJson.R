@@ -110,7 +110,7 @@ runModelsFromJson <- function(outputFolder,
         if(!is.null(recalibrate)){
           ParallelLogger::logInfo('Recalibrating')
           for(k in 1:length(recalibrate)){
-            if(recalibrate[k] %in% c('RecalibrationintheLarge', 'weakRecalibration')){
+            if(recalibrate[k] %in% c('recalibrationInTheLarge', 'weakRecalibration')){
               ParallelLogger::logInfo(paste0('Using method ', recalibrate[k]))
               recal <- PatientLevelPrediction::recalibratePlp(evaluation$prediction,
                                                               analysisId = analysisId,
@@ -118,7 +118,7 @@ runModelsFromJson <- function(outputFolder,
 
               evaluation$prediction <- recal$prediction
               evaluation$performanceEvaluation <- PatientLevelPrediction::addRecalibration(evaluation$performanceEvaluation,
-                                                                                           recalibration = recal)
+                                                                                           recalibration = recal$performanceEvaluation)
             }
 
           }
