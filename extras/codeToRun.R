@@ -41,15 +41,22 @@ createCohorts = T
 
 # apply the models in the package to your data?
 runValidation = F
+
 # if you only want to apply models to a sample of
 # patients put the number as the sampleSize
 sampleSize = NULL
+
 # do you want to recalibrate results?
 # NULL means none (see ?SkeletonPredictionValidationStudy::execute for options)
 recalibrate <- NULL
 
+# evaluate the model also in age and sex strata.
+# NULL means none (see ?SkeletonPredictionValidationStudy::execute for options)
+stratifiedEval <- NULL
+
 # extract the results to share as a zip file?
 packageResults = T
+
 # when extracting results - what is the min cell count?
 minCellCount = 5
 
@@ -66,6 +73,7 @@ SkeletonPredictionValidationStudy::execute(connectionDetails = connectionDetails
                                            outputFolder = outputFolder,
                                            createCohorts = createCohorts,
                                            recalibrate = recalibrate,
+                                           stratifiedEval = stratifiedEval,
                                            runValidation = runValidation,
                                            packageResults = packageResults,
                                            minCellCount = minCellCount,

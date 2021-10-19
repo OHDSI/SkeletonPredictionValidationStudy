@@ -1,18 +1,19 @@
 # edit to make popSetting and ids an option as input to overwrite.
 runModelsFromJson <- function(outputFolder,
-                                 connectionDetails,
-                                 cohortDatabaseSchema,
-                                 outcomeDatabaseSchema,
-                                 cdmDatabaseSchema,
+                              connectionDetails,
+                              cohortDatabaseSchema,
+                              outcomeDatabaseSchema,
+                              cdmDatabaseSchema,
                               cdmVersion,
-                                 oracleTempSchema,
-                                 cdmDatabaseName,
-                                 cohortTable,
-                                 outcomeTable,
-                                 sampleSize,
-                                 keepPrediction,
-                                 recalibrate,
-                                 verbosity){
+                              oracleTempSchema,
+                              cdmDatabaseName,
+                              cohortTable,
+                              outcomeTable,
+                              sampleSize,
+                              keepPrediction,
+                              recalibrate,
+                              stratifiedEval,
+                              verbosity){
 
   settingsLocation <- system.file("settings/plpAnalysisList.json",
                                   package = "SkeletonPredictionValidationStudy")
@@ -120,8 +121,15 @@ runModelsFromJson <- function(outputFolder,
               evaluation$performanceEvaluation <- PatientLevelPrediction::addRecalibration(evaluation$performanceEvaluation,
                                                                                            recalibration = recal$performanceEvaluation)
             }
-
           }
+        }
+
+        # add stratified evaluation
+        if(!is.null(stratifiedEval)) {
+          ParallelLogger::logInfo('Evaluating in subpopulations')
+          evaluation <- stratifiedEvaluation(evaluation = evaluation,
+                                             analysisId = analysisId,
+                                             strata = stratifiedEval)
         }
 
         # format results

@@ -21,6 +21,9 @@
 #'                             This table will hold the exposure and outcome cohorts used in this
 #'                             study.
 #' @param recalibrate          Whether to recalibrate ('recalibrationInTheLarge' and/or 'weakRecalibration')
+#' @param stratifiedEval       Evaluate model in age and sex strata. For example, to evaluate in male and female,
+#'                             and in age 0-64 and age 65-150, inclusive, use the following parameter:
+#'                             list(ageStrata = list(c(0, 64), c(65, 150)), sexStrata = list(8507, 8532))
 #' @param outputFolder         Name of local folder to place results; make sure to use forward slashes
 #'                             (/)
 #' @param createCohorts        Whether to create the cohorts for the study
@@ -41,6 +44,7 @@ execute <- function(connectionDetails,
                     outputFolder,
                     createCohorts = T,
                     recalibrate = NULL,
+                    stratifiedEval = NULL,
                     runValidation = T,
                     packageResults = T,
                     minCellCount = 5,
@@ -88,6 +92,7 @@ execute <- function(connectionDetails,
                         sampleSize = sampleSize,
                         keepPrediction = keepPrediction,
                         recalibrate = recalibrate,
+                        stratifiedEval = stratifiedEval,
                         verbosity = verbosity)
 
     }else{
