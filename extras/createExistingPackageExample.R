@@ -1,4 +1,4 @@
-source('./extras/createExistingPackage.R')
+source('./extras/skeletonHelpers.R')
 # example
 baseUrl <- 'https://...'
 authMethod <- 'windows'

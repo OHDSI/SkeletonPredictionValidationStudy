@@ -5,6 +5,7 @@
 #' package.
 #'
 updatePackageVersion <- function() {
+  source("./extras/skeletonHelpers.R")
 
   # Get the skeleton version of the current package. The skeleton version is
   # stored in the SkeletonNote field in the DESCRIPTION file.
@@ -22,7 +23,6 @@ updatePackageVersion <- function() {
   )
 
   # Download the latest skeleton to a temporary location
-  source("extras/skeletonHelpers.R")
   packageLocation <- downLoadSkeleton(outputFolder = tempdir(),
                                       packageName = packageName)
 
