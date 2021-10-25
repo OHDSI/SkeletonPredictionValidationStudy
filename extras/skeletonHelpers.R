@@ -212,7 +212,7 @@ createModelSetting <- function(modelName,
                      baselineHazard = baselineHazard)
   )
 
-  cohortIds = unique(c(targetId, outcomeIds, modCovariateSettings$cohortIds))
+  cohortIds = unique(c(targetId, outcomeId, modCovariateSettings$cohortIds))
   cohortDefinitions <- getCohorts(cohortIds, baseUrl)
 
   return(list(modelList = settings,
