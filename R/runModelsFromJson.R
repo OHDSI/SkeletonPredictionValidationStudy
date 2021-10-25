@@ -14,7 +14,7 @@ runModelsFromJson <- function(outputFolder,
                                  recalibrate,
                                  verbosity){
 
-  settingsLocation <- system.file("settings/plpAnalysisList.json",
+  settingsLocation <- system.file("settings/predictionAnalysisList.json",
                                   package = "SkeletonPredictionValidationStudy")
 
   jsonSettings <- Hydra::loadSpecifications(settingsLocation)

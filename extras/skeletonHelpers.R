@@ -251,7 +251,7 @@ getCoefficients <- function(covariateSettings){
 # on the GitHub repository of interest
 downLoadSkeleton <- function(outputFolder,
                              packageName,
-                             skeletonType = 'SkeletonPredictionStudy'){
+                             skeletonType = 'SkeletonPredictionValidationStudy'){
   # check outputFolder exists
 
   # check file.path(outputFolder,  packageName) does not exist
@@ -283,6 +283,7 @@ replaceName <- function(packageLocation = getwd(),
   filesToEdit <- c(file.path(packageLocation,"DESCRIPTION"),
                    file.path(packageLocation,"README.md"),
                    file.path(packageLocation,"extras/CodeToRun.R"),
+                   file.path(packageLocation, "extras/updateSkeleton.R"),
                    dir(file.path(packageLocation,"R"), full.names = T))
   for( f in filesToEdit ){
     ParallelLogger::logInfo(paste0('Editing ', f))
@@ -387,4 +388,10 @@ addAttr <- function(covariateSettings){
 
   return(covariateSettings)
 
+}
+
+getLatestSkeletonVersion <- function(dir) {
+  packageDescription('SkeletonPredictionValidationStudy',
+                     lib.loc = dir,
+                     fields = "Version")
 }
