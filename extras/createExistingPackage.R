@@ -182,7 +182,7 @@ createMeasurementCovariateSetting <- function(covariateName,
 
 createModelSetting <- function(modelName,
                                targetId ,
-                               outcomeIds,
+                               outcomeId,
                                populationSettings = PatientLevelPrediction::createStudyPopulationSettings(),
                                covariateSettings = list(list(fnct = '', settings = list(), coeff = list(point = 1)),
                                                         list(fnct = '', settings = list(), coeff = list(point = 1))
@@ -198,9 +198,11 @@ createModelSetting <- function(modelName,
 
   settings <- list(name = editName(modelName),
                    cohortId = targetId,
-                   outcomeId = outcomeIds,
-                   populationSettings = populationSettings,
-                   covariateSettings = modCovariateSettings$settings,
+                   outcomeId = outcomeId,
+                   settings = list(cohortId = targetId,
+                                   outcomeId = outcomeId,
+                                   populationSettings = populationSettings,
+                                   covariateSettings = modCovariateSettings$settings),
                    attr_predictionType = predictionType,
                    attr_type = 'nonPlpGlm',
                    model = list(

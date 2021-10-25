@@ -37,7 +37,7 @@ covariateDiabetes <- createCohortCovariateSetting(atlasId = 746,
 
 model1 <- createModelSetting(modelName = 'example 1',
                              targetId = 636,
-                             outcomeIds = 2265,
+                             outcomeId = 2265,
                              populationSettings = popSet,
                              covariateSettings = list(covariateHyper, covariateDepression, covariateDiabetes),
                              predictionType = 'binary',
