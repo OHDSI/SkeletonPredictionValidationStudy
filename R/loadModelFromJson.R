@@ -65,6 +65,12 @@ fromModelJson <- function(modelSettings,modelLoc){
 
 
 editPreprocessing <- function(settings){
+  if(is.null(settings$metaData)){
+    return(settings)
+  }
+  if(is.null(settings$metaData$preprocessSettings)){
+    return(settings)
+  }
   if(!is.null(settings$metaData$preprocessSettings$deletedInfrequentCovariateIds)){
     settings$metaData$preprocessSettings$deletedInfrequentCovariateIds <- unlist(settings$metaData$preprocessSettings$deletedInfrequentCovariateIds)
   }
