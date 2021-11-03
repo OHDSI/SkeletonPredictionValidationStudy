@@ -50,7 +50,7 @@ Study <- R6::R6Class(
       self$packageDescription <- jsonSettings$packageDescription
       self$createdBy <- jsonSettings$createdBy
       self$organizationName <- jsonSettings$organizationName
-      self$analysisSettings <- self$getAnalysis(jsonSettings)
+      self$analysisSettings <- private$getAnalyses(jsonSettings)
     }),
 
   private = list(
@@ -60,9 +60,9 @@ Study <- R6::R6Class(
       result <- data.frame(modelName = unlist(lapply(jsonSettings$models, function(x) x$name)),
                            modelType = unlist(lapply(jsonSettings$models, function(x) x$attr_type)),
                            cohortId = unlist(lapply(jsonSettings$models, function(x) x$cohortId)),
-                           cohortName = self$getCohortName(jsonSettings,unlist(lapply(jsonSettings$models, function(x) x$cohortId))),
+                           cohortName = private$getCohortName(jsonSettings,unlist(lapply(jsonSettings$models, function(x) x$cohortId))),
                            outcomeId = unlist(lapply(jsonSettings$models, function(x) x$outcomeId)),
-                           outcomeName = getCohortName(jsonSettings,unlist(lapply(jsonSettings$models, function(x) x$outcomeId)))
+                           outcomeName = private$getCohortName(jsonSettings,unlist(lapply(jsonSettings$models, function(x) x$outcomeId)))
       )
       result$analysisId <- paste(result$modelName, result$cohortId, result$outcomeId, sep='_')
 
