@@ -1,35 +1,59 @@
-#' @title Model Class
+#' Model Class
+#' @description
+#' Model class.
 #' @export
-Model <- R6Class(
+Model <- R6::R6Class(
   "Model",
   public = list(
 
-    #' @field model name (`character(1)`)
+    #' @field name (`character(1)`)\cr
+    #' Unique name of the model.
     name = NULL,
 
-    #' @field target cohort identifier (`numeric(1)`)
+    #' @field cohortId (`numeric(1)`)\cr
+    #' Target cohort identifier.
     cohortId = NULL,
 
-    #' @field list of outcome cohorts (`numeric(N)`)
+    #' @field outcomeId (`numeric(N)`)\cr
+    #' List of outcome cohort identifiers.
     outcomeId = NULL,
 
-    #' @field prediction type (`character(1)`)
+    #' @field attr_predictionType (`character(1)`)\cr
+    #' Prediction type.
     attr_predictionType = NULL,
 
-    #' @field model type (`character(1)`)
+    #' @field attr_type (`character(1)`)\cr
+    #' Model type.
     attr_type = NULL,
 
-    #' @field set of model parameters (`[Parameter]`)
+    #' @field model (`[Parameter]`)\cr
+    #' Single set of model parameters
     model = NULL,
 
+    #' @field populationSettings (`TBD`)\cr
+    #' Population settings.
     populationSettings = NULL,
+
+    #' @field covariateSettings (`TBD`)\cr
+    #' Covariate settings.
     covariateSettings = NULL,
-    model = NULL,
+
+    #' @field covariateMap (`TBD`)\cr
+    #' Covariate map.
     covariateMap = NULL,
+
+    #' @field varImp (`TBD`)\cr
+    #' Variable importance.
     varImp = NULL,
 
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
+    #' @template param_cohortId
+    #' @template param_outcomeId
+    #' @template param_coefficients
+    #' @template param_finalMapping
+    #' @template param_offset
+    #' @template param_baselineHazard
     initialize = function(cohortId = NULL,
                           outcomeId = NULL,
                           coefficients = NULL,
@@ -53,35 +77,14 @@ Model <- R6Class(
       )
     },
 
+    #' @description
+    #' predict
     predict = function() {
     },
 
+    #' @description
+    #' loadModelFromJson
     loadModelFromJson = function() {
-    },
-
-    setCoefficients = function(covariateSettings) {
-      assert_class(self$model, classes = "Parameter")
-      self$model$setCoefficients(covariateSettings)
     }
-
-    #' #' @description
-    #' #' Printer.
-    #' #' @param ... (ignored)
-    #' print = function(...) {
-    #'   # cat(format(self))
-    #'   cat("* Cohort ID:" , self$cohortId, "\n", sep = "")
-    #'   cat("* Outcome ID:" , self$outcomeId, "\n", sep = "")
-    #'   cat("* Prediction Type:" , self$attr_predictionType, "\n", sep = "")
-    #'   cat("* Model Type:" , self$attr_type, "\n", sep = "")
-    #'   w = self$warnings
-    #'   e = self$errors
-    #'   if (length(w)) {
-    #'     catn("* Warnings:", w)
-    #'   }
-    #'   if (length(e)) {
-    #'     catn("* Errors:", e)
-    #'   }
-    #'   return(invisible(self))
-    #' }
   )
 )

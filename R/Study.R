@@ -1,38 +1,49 @@
-#' @title Study Class
+#' Study Class
+#' @description
+#' Model description goes here.
 #' @export
-Study <- R6Class(
+Study <- R6::R6Class(
   "Study",
   public = list(
 
-    #' @field package name (`character(1)`)
+    #' @field packageName (`character(1)`)\cr
+    #' Package name.
     packageName = NULL,
 
-    #' @field package description (`character(1)`)
+    #' @field packageDescription (`character(1)`)\cr
+    #' Package description.
     packageDescription = NULL,
 
-    #' @field created by names (`character(1)`)
+    #' @field createdBy (`character(1)`)\cr
+    #' Created by names.
     createdBy = NULL,
 
-    #' @field organization name (`character(1)`)
+    #' @field organizationName (`character(1)`)\cr
+    #' Organization name.
     organizationName = NULL,
 
-    #' @field analysis settings (`data.frame(1)`)
+    #' @field analysisSettings (`data.frame(1)`)\cr
+    #' Analysis settings.
     analysisSettings = NULL,
 
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
-    initialize = function(path = NULL) {
-      self$loadStudyFromJson(path)
+    #' @template param_studyPath
+    initialize = function(studyPath = NULL) {
+      self$loadStudyFromJson(studyPath)
       self$analysisSettings <- self$getAnalyses()
     },
 
-    loadStudyFromJson = function(path = NULL) {
+    #' @description
+    #' Load study from JSON file
+    #' @template param_studyPath
+    loadStudyFromJson = function(studyPath = NULL) {
 
-      if (is.null(path)) {
-        path <- system.file("settings/predictionAnalysisList.json",
+      if (is.null(studyPath)) {
+        studyPath <- system.file("settings/predictionAnalysisList.json",
                             package = "SkeletonPredictionValidationStudy")
       }
-      paramTemp <- readChar(path, file.info(path)$size)
+      paramTemp <- readChar(studyPath, file.info(studyPath)$size)
       jsonSettings <- RJSONIO::fromJSON(paramTemp)
 
       self$packageName <- jsonSettings$packageName

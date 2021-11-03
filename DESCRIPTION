@@ -22,6 +22,7 @@ Imports:
   OhdsiSharing,
   ParallelLogger (>= 2.0.0),
   PatientLevelPrediction (>= 4.0.0),
+  R6,
   reticulate,
   RJSONIO,
   rlang,
@@ -31,5 +32,7 @@ Imports:
 Suggests:
   testthat
 NeedsCompilation: no
+Roxygen: list(markdown = TRUE, r6 = TRUE)
 RoxygenNote: 7.1.1
 SkeletonNote: 1.0.4
+Encoding: UTF-8

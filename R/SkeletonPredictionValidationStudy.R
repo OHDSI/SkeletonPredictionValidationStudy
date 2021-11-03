@@ -23,6 +23,7 @@
 #' @docType package
 #' @name SkeletonPredictionValidationStudy
 #' @import DatabaseConnector
+#' @importFrom R6 R6Class
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 NULL

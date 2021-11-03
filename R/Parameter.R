@@ -1,23 +1,33 @@
-#' @title Model Class
+#' Model Class
+#' @description
+#' Model description goes here.
 #' @export
-Parameter <- R6Class(
+Parameter <- R6::R6Class(
   "Parameter",
   public = list(
 
-    #' @field coefficient data (`data.frame(1)`)
+    #' @field coefficients (`data.frame(1)`)\cr
+    #' Model coefficients.
     coefficients = NULL,
 
-    #' @field mapping function of the form 'function(x){return(x)}' (`character(1)`)
+    #' @field finalMapping (`character(1)`)\cr
+    #' Mapping function of the form 'function(x){return(x)}'.
     finalMapping = NULL,
 
-    #' @field offset (`numeric(1)`)
+    #' @field offset (`numeric(1)`)\cr
+    #' Offset.
     offset = NULL,
 
-    #' @field baseline hazard (`numeric(1)`)
+    #' @field baselineHazard (`numeric(1)`)\cr
+    #' Baseline hazard.
     baselineHazard = NULL,
 
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
+    #' @template param_coefficients
+    #' @template param_finalMapping
+    #' @template param_offset
+    #' @template param_baselineHazard
     initialize = function(coefficients,
                           finalMapping = 'function(x){return(x)}',
                           offset = numeric(),
@@ -63,6 +73,8 @@ Parameter <- R6Class(
       }
     },
 
+    #' @description
+    #' getParameters
     getParameters = function() {
 
     },
