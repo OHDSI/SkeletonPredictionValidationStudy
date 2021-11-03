@@ -390,8 +390,8 @@ addAttr <- function(covariateSettings){
 
 }
 
-getLatestSkeletonVersion <- function(dir) {
-  packageDescription('SkeletonPredictionValidationStudy',
+getLatestSkeletonVersion <- function(dir, packageName) {
+  packageDescription(packageName,
                      lib.loc = dir,
                      fields = "Version")
 }
