@@ -17,9 +17,12 @@ runModelsFromJson <- function(outputFolder,
   settingsLocation <- system.file("settings/predictionAnalysisList.json",
                                   package = "SkeletonPredictionValidationStudy")
 
-  jsonSettings <- Hydra::loadSpecifications(settingsLocation)
-  jsonSettings <- RJSONIO::fromJSON(jsonSettings)
-  analysisSettings <- getAnalyses(jsonSettings)
+  # instantiate a new object of the Study class by loading settings from path
+  plpStudy <- Study$new(settingsLocation)
+
+  # jsonSettings <- Hydra::loadSpecifications(settingsLocation)
+  # jsonSettings <- RJSONIO::fromJSON(jsonSettings)
+  # analysisSettings <- getAnalyses(jsonSettings)
 
   # analysisId, modelName, modelType, cohortId, cohortName, outcomeId, outcomeName ...
 

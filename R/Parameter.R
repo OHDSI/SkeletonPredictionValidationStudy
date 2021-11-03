@@ -1,4 +1,5 @@
 #' @title Model Class
+#' @export
 Parameter <- R6Class(
   "Parameter",
   public = list(

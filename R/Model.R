@@ -1,6 +1,3 @@
-library("R6")
-library("checkmate")
-
 #' @title Model Class
 #' @export
 Model <- R6Class(
@@ -21,6 +18,9 @@ Model <- R6Class(
 
     #' @field model type (`character(1)`)
     attr_type = NULL,
+
+    #' @field set of model parameters (`[Parameter]`)
+    model = NULL,
 
     populationSettings = NULL,
     covariateSettings = NULL,
