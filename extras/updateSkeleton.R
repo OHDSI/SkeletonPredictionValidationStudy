@@ -4,7 +4,7 @@
 #' Fetches the latest feature and changes to the skeleton to update the existing
 #' package.
 #'
-updatePackageVersion <- function() {
+updatePackageVersion <- function(force = FALSE) {
   source("./extras/skeletonHelpers.R")
 
   # Get the skeleton version of the current package. The skeleton version is
@@ -27,12 +27,13 @@ updatePackageVersion <- function() {
                                       packageName = packageName)
 
   # Get the version number of the downloaded/latest skeleton
-  latestSkeletonVersion <- getLatestSkeletonVersion(dir = tempdir())
+  latestSkeletonVersion <- getLatestSkeletonVersion(dir = tempdir(),
+                                                    packageName = packageName)
 
   # If a new version is available?
-  if (compareVersion(skeletonVersion, latestSkeletonVersion) == 0) {
+  if (compareVersion(skeletonVersion, latestSkeletonVersion) == 0 && !force) {
     print("Package skeleton is up-to-date.")
-  } else if (compareVersion(skeletonVersion, latestSkeletonVersion) == -1) {
+  } else if (compareVersion(skeletonVersion, latestSkeletonVersion) == -1 || force) {
     print(paste0("Your current version is ", skeletonVersion, " and version ",
                  latestSkeletonVersion, " is available. Updating.."))
 
@@ -41,7 +42,8 @@ updatePackageVersion <- function() {
                 packageName = packageName)
 
     # Copy latest files from R folder to project
-    file.copy(dir(file.path(packageLocation, "R")), file.path(getwd(), "R"),
+    file.copy(file.path(file.path(packageLocation, "R"),dir(file.path(packageLocation, "R"))),
+              file.path(getwd(), "R"),
               recursive = TRUE, overwrite = TRUE)
 
     # Update skeleton version number in DESCRIPTION file
