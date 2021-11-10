@@ -23,6 +23,18 @@ Organization name.}
 
 \item{\code{analysisSettings}}{(\code{data.frame(1)})\cr
 Analysis settings.}
+
+\item{\code{outputFolder}}{(\code{character(1)})\cr
+Output folder.}
+
+\item{\code{databaseName}}{(\code{character(1)})\cr
+Database name.}
+
+\item{\code{model}}{(\verb{[Model]})\cr
+Prediction models.}
+
+\item{\code{data}}{(\verb{[Data]})\cr
+Data handler.}
 }
 \if{html}{\out{</div>}}
 }
@@ -59,14 +71,20 @@ Path to a prediction study in the JSON format.}
 \if{html}{\out{<a id="method-loadStudyFromJson"></a>}}
 \if{latex}{\out{\hypertarget{method-loadStudyFromJson}{}}}
 \subsection{Method \code{loadStudyFromJson()}}{
-Load study from JSON file
+Load study from JSON file.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Study$loadStudyFromJson(studyPath = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Study$loadStudyFromJson(databaseName, outputFolder, studyPath = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
+\item{\code{databaseName}}{(\code{character(1)})\cr
+A string representing a shareable name of your databasd}
+
+\item{\code{outputFolder}}{(\code{character(1)})\cr
+Name of local folder to place results; make sure to use forward slashes (/).}
+
 \item{\code{studyPath}}{(\code{character(1)})\cr
 Path to a prediction study in the JSON format.}
 

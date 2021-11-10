@@ -2,6 +2,7 @@
 
 S3method(predict,nonPlpGlm)
 S3method(predict,pythonJson)
+export(Data)
 export(Model)
 export(Parameter)
 export(Study)
