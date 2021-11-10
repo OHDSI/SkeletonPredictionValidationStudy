@@ -45,8 +45,8 @@ Study <- R6::R6Class(
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
     #' @template param_studyPath
-    initialize = function(studyPath = NULL) {
-      self$loadStudyFromJson(studyPath)
+    initialize = function(databaseName, outputFolder, studyPath = NULL) {
+      self$loadStudyFromJson(databaseName, outputFolder, studyPath)
     },
 
     #' @description
@@ -80,136 +80,12 @@ Study <- R6::R6Class(
 
       # instantiate Models
       # self$model <- Model$new()
+    },
+
+    getAnalysisIter = function() {
+      analysisIter <- iterators::iter(self$analysisSettings)
     }
 
-    # #' @description
-    # #' Run study.
-    # runStudy = function() {
-    #
-    #   for(i in 1:nrow(analysisSettings)) {
-    #
-    #     analysisId <- analysisSettings$analysisId[i]
-    #
-    #     if(file.exists(file.path(outputFolder,cdmDatabaseName,analysisId, 'validationResult.rds'))){
-    #       ParallelLogger::logInfo(paste0('Analysis at ',
-    #                                      file.path(outputFolder,cdmDatabaseName,analysisId),
-    #                                      ' exists - skipping'))
-    #     }else {
-    #
-    #       populationSettings <- getPopulationSettings(jsonSettings,
-    #                                                   analysisSettings$modelName[i])
-    #       populationSettings$outcomeId <- analysisSettings$outcomeId[i]
-    #
-    #       covariateSettings <- getCovariateSettings(jsonSettings,
-    #                                                 analysisSettings$modelName[i],
-    #                                                 cohortDatabaseSchema,
-    #                                                 cohortTable)
-    #
-    #       plpDataSettings <- list(connectionDetails = connectionDetails,
-    #                               cdmDatabaseSchema = cdmDatabaseSchema,
-    #                               cohortDatabaseSchema = cohortDatabaseSchema,
-    #                               cohortTable = cohortTable,
-    #                               cohortId = analysisSettings$cohortId[i],
-    #                               outcomeDatabaseSchema = cohortDatabaseSchema,
-    #                               outcomeTable = cohortTable,
-    #                               outcomeIds = analysisSettings$outcomeId[i],
-    #                               oracleTempSchema = oracleTempSchema,
-    #                               firstExposureOnly = populationSettings$firstExposureOnly,
-    #                               sampleSize = sampleSize,
-    #                               cdmVersion = cdmVersion,
-    #                               covariateSettings = covariateSettings)
-    #
-    #       # get data
-    #       if(!file.exists(file.path(outputFolder,cdmDatabaseName,analysisId, 'plpData'))){
-    #         plpData <- tryCatch({do.call(PatientLevelPrediction::getPlpData, plpDataSettings)},
-    #                             error = function(e){ParallelLogger::logError(e); return(NULL)})
-    #
-    #         if(!is.null(plpData)){
-    #           if(!dir.exists(file.path(outputFolder,cdmDatabaseName,analysisId))){
-    #             dir.create(file.path(outputFolder,cdmDatabaseName,analysisId))
-    #           }
-    #           PatientLevelPrediction::savePlpData(plpData, file.path(outputFolder,cdmDatabaseName,analysisId, 'plpData'))
-    #         }
-    #
-    #       } else{
-    #         ParallelLogger::logInfo(paste0('Data exists at ',
-    #                                        file.path(outputFolder,cdmDatabaseName,analysisId),
-    #                                        ' - loading'))
-    #         plpData <- PatientLevelPrediction::loadPlpData(file.path(outputFolder,cdmDatabaseName,analysisId, 'plpData'))
-    #       }
-    #
-    #       # get population
-    #       if(!file.exists(file.path(outputFolder,cdmDatabaseName,analysisId, 'population.rds'))){
-    #
-    #         populationSettings$plpData <- plpData
-    #         population <- tryCatch({do.call(PatientLevelPrediction::createStudyPopulation, populationSettings)},
-    #                                error = function(e){ParallelLogger::logError(e); return(NULL)})
-    #         if(!is.null(population)){
-    #           saveRDS(population, file.path(outputFolder,cdmDatabaseName,analysisId, 'population.rds'))
-    #         }
-    #       } else{
-    #         ParallelLogger::logInfo(paste0('Population exists at ',
-    #                                        file.path(outputFolder,cdmDatabaseName,analysisId),
-    #                                        ' - loading'))
-    #         population <- readRDS(file.path(outputFolder,cdmDatabaseName,analysisId, 'population.rds'))
-    #       }
-    #
-    #
-    #       # get model
-    #       plpModel <- tryCatch({ loadModelFromJson(jsonSettings,
-    #                                                analysisSettings$modelName[i])
-    #       },error = function(e){ParallelLogger::logError(e); return(NULL)})
-    #
-    #
-    #       # apply model
-    #       evaluation <- tryCatch({PatientLevelPrediction::applyModel(population = population,
-    #                                                                  plpData = plpData,
-    #                                                                  plpModel = plpModel)},
-    #                              error = function(e){ParallelLogger::logError(e); return(NULL)})
-    #
-    #       if(!is.null(evaluation)){
-    #
-    #         # add recalibration if desired
-    #         if(!is.null(recalibrate)){
-    #           ParallelLogger::logInfo('Recalibrating')
-    #           for(k in 1:length(recalibrate)){
-    #             if(recalibrate[k] %in% c('recalibrationInTheLarge', 'weakRecalibration')){
-    #               ParallelLogger::logInfo(paste0('Using method ', recalibrate[k]))
-    #               recal <- PatientLevelPrediction::recalibratePlp(evaluation$prediction,
-    #                                                               analysisId = analysisId,
-    #                                                               method = recalibrate[k])
-    #
-    #               evaluation$prediction <- recal$prediction
-    #               evaluation$performanceEvaluation <- PatientLevelPrediction::addRecalibration(evaluation$performanceEvaluation,
-    #                                                                                            recalibration = recal$performanceEvaluation)
-    #             }
-    #
-    #           }
-    #         }
-    #
-    #         # format results
-    #         result <- formatResults(result = evaluation,
-    #                                 populationSettings = populationSettings,
-    #                                 covariateSettings = covariateSettings,
-    #                                 cdmDatabaseName = cdmDatabaseName,
-    #                                 modelType = analysisSettings$modelType[i],
-    #                                 modelName = analysisSettings$omodelName[i])
-    #
-    #         if(!is.null(result)){
-    #
-    #           if(!dir.exists(file.path(outputFolder,cdmDatabaseName,analysisId))){
-    #             dir.create(file.path(outputFolder,cdmDatabaseName,analysisId), recursive = T)
-    #           }
-    #
-    #           ParallelLogger::logInfo("Saving results")
-    #           saveRDS(result, file.path(outputFolder,cdmDatabaseName,analysisId, 'validationResult.rds'))
-    #           ParallelLogger::logInfo(paste0("Results saved to:",file.path(outputFolder,cdmDatabaseName,analysisId)))
-    #         }
-    #
-    #       }
-    #     }
-    #   } # analysis
-    # }
   ),
 
   private = list(
@@ -217,10 +93,10 @@ Study <- R6::R6Class(
       assert_character(self$outputFolder)
       assert_character(self$databaseName)
 
-      if (!file.exists(file.path(outputFolder, databaseName))){
-        dir.create(file.path(outputFolder, databaseName), recursive = TRUE)
+      if (!file.exists(file.path(self$outputFolder, self$databaseName))){
+        dir.create(file.path(self$outputFolder, self$databaseName), recursive = TRUE)
       }
-      ParallelLogger::addDefaultFileLogger(file.path(outputFolder, databaseName, "log.txt"))
+      ParallelLogger::addDefaultFileLogger(file.path(self$outputFolder, self$databaseName, "log.txt"))
     },
 
     getAnalyses = function(jsonSettings){

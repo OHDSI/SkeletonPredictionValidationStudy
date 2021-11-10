@@ -18,6 +18,7 @@ Imports:
   ggplot2,
   gridExtra,
   Hydra,
+  iterators,
   magrittr,
   OhdsiSharing,
   ParallelLogger (>= 2.0.0),
