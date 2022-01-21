@@ -1,8 +1,8 @@
 Package: SkeletonPredictionValidationStudy
 Type: Package
 Title: Add the title of the package here
-Version: 1.0.4
-Date: 2021-06-07
+Version: 2.0.0
+Date: 2022-01-21
 Author: your name [aut]
 Maintainer: your name <youremail@address>
 Description: Write your study package description here.
@@ -15,19 +15,12 @@ Imports:
   DatabaseConnector (>= 3.0.0),
   dplyr,
   FeatureExtraction (>= 3.0.0),
-  ggplot2,
-  gridExtra,
-  Hydra,
-  magrittr,
+  jsonlite,
   OhdsiSharing,
   ParallelLogger (>= 2.0.0),
-  PatientLevelPrediction (>= 4.0.0),
-  reticulate,
-  RJSONIO,
+  PatientLevelPrediction (>= 5.0.0),
   rlang,
-  SqlRender,
-  stats,
-  xgboost
+  SqlRender
 Suggests:
   testthat
 NeedsCompilation: no
