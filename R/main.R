@@ -1,4 +1,3 @@
-
 #' Execute the validation study
 #'
 #' @details

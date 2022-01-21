@@ -1,5 +1,3 @@
-
-
 #' Prediction for existing GLM
 #'
 #' @details
@@ -56,4 +54,3 @@ predictNonPlpGlm <- function(plpModel, data, cohort){
 
   return(prediction)
 }
-
