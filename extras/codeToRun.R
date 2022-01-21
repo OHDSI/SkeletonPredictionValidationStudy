@@ -54,20 +54,41 @@ packageResults = T
 minCellCount = 5
 
 #=============================
+# configure the settings
+databaseDetails <- PatientLevelPrediction::createDatabaseDetails(
+  connectionDetails = connectionDetails,
+  cdmDatabaseSchema = cdmDatabaseSchema,
+  cdmDatabaseName = databaseName,
+  tempEmulationSchema = tempEmulationSchema,
+  cohortDatabaseSchema = cohortDatabaseSchema,
+  cohortTable = cohortTable,
+  outcomeDatabaseSchema = cohortDatabaseSchema,
+  outcomeTable = cohortTable,
+  cdmVersion = 5
+)
 
+restrictPlpDataSettings <- PatientLevelPrediction::createRestrictPlpDataSettings(
+  sampleSize = sampleSize
+)
+
+validationSettings <- PatientLevelPrediction::createValidationSettings(
+  recalibrate = recalibrate
+)
+
+logSettings <- PatientLevelPrediction::createLogSettings(
+  verbosity = verbosity
+)
+
+#=============================
 # Now run the study
-SkeletonPredictionValidationStudy::execute(connectionDetails = connectionDetails,
-                                           databaseName = databaseName,
-                                           cdmVersion = 5,
-                                           cdmDatabaseSchema = cdmDatabaseSchema,
-                                           cohortDatabaseSchema = cohortDatabaseSchema,
-                                           oracleTempSchema = oracleTempSchema,
-                                           cohortTable = cohortTable,
-                                           outputFolder = outputFolder,
-                                           createCohorts = createCohorts,
-                                           recalibrate = recalibrate,
-                                           runValidation = runValidation,
-                                           packageResults = packageResults,
-                                           minCellCount = minCellCount,
-                                           sampleSize = sampleSize,
-                                           verbosity = verbosity)
+SkeletonPredictionValidationStudy::execute(
+  databaseDetails = databaseDetails,
+  restrictPlpDataSettings = restrictPlpDataSettings,
+  validationSettings = validationSettings,
+  logSettings = logSettings,
+  outputFolder = outputFolder,
+  createCohorts = createCohorts,
+  runValidation = runValidation,
+  packageResults = packageResults,
+  minCellCount = minCellCount
+)

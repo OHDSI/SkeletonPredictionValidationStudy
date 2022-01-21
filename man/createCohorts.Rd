@@ -9,7 +9,7 @@ createCohorts(
   cdmDatabaseSchema,
   cohortDatabaseSchema,
   cohortTable = "cohort",
-  oracleTempSchema,
+  tempEmulationSchema,
   outputFolder
 )
 }
@@ -30,7 +30,7 @@ include both the database and schema name, for example 'cdm_data.dbo'.}
 This table will hold the exposure and outcome cohorts used in this
 study.}
 
-\item{oracleTempSchema}{Should be used in Oracle to specify a schema where the user has write
+\item{tempEmulationSchema}{Should be used in Oracle to specify a schema where the user has write
 priviliges for storing temporary tables.}
 
 \item{outputFolder}{Name of local folder to place results; make sure to use forward slashes

@@ -14,35 +14,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 #' Package the results for sharing with OHDSI researchers
 #'
 #' @details
 #' This function packages the results.
 #'
-#' @param outputFolder        Name of local folder to place results; make sure to use forward slashes
+#' @param outputFolder        Name of folder containing the study analysis results
+#' @param databaseName        Name of the database being validated
 #'                            (/)
 #' @param minCellCount        The minimum number of subjects contributing to a count before it can be included in the results.
 #'
-#' @export
-packageResults <- function(outputFolder,
-                           minCellCount = 5) {
+packageResults <- function(
+  outputFolder,
+  databaseName,
+  minCellCount = 5
+  ) {
   if(missing(outputFolder)){
     stop('Missing outputFolder...')
   }
 
   # for each analysis copy the requested files...
-  folders <- list.dirs(path = outputFolder, recursive = T, full.names = F)
+  folders <- list.dirs(
+    path = file.path(outputFolder, databaseName),
+    recursive = F,
+    full.names = F
+    )
   folders <- folders[grep('Analysis_', folders)]
-  if(length(grep('inst/plp_models', folders))>0){
-    folders <- folders[-grep('inst/plp_models', folders)] #in case using package directory
-  }
-
-  if(length(folders)==0){
-    stop('No results to export...')
-  }
 
   #create export subfolder in workFolder
-  exportFolder <- file.path(outputFolder, "export")
+  exportFolder <- file.path(outputFolder,databaseName, "export")
+  if(!dir.exists(exportFolder)){
+    dir.create(exportFolder, recursive = T)
+  }
 
   for(folder in folders){
     #copy all plots across
@@ -51,39 +55,23 @@ packageResults <- function(outputFolder,
     }
 
     # loads analysis results
-    if(file.exists(file.path(outputFolder,folder, 'validationResult.rds'))){
-      plpResult <- readRDS(file.path(outputFolder,folder, 'validationResult.rds'))
+    if(dir.exists(file.path(outputFolder, databaseName, folder, 'validationResult'))){
+      plpResult <- PatientLevelPrediction::loadPlpResult(file.path(outputFolder, databaseName, folder, 'validationResult'))
 
-      if(minCellCount==0){
-        minCellCount <- NULL
-      }
-      cvst <- plpResult$inputSetting$dataExtrractionSettings$covariateSettings
-
-      result <- PatientLevelPrediction::transportPlp(plpResult, save = F,
-                                                     n=minCellCount,
-                                                     includeEvaluationStatistics=T,
-                                                     includeThresholdSummary=T,
-                                                     includeDemographicSummary=T,
-                                                     includeCalibrationSummary =T,
-                                                     includePredictionDistribution=T,
-                                                     includeCovariateSummary=T)
-
-      result$inputSetting$dataExtrractionSettings$covariateSettings <- cvst
-      if(!is.null(result$inputSetting$populationSettings$plpData)){
-        result$inputSetting$populationSettings$plpData <- NULL
-      }
-      PatientLevelPrediction::savePlpToCsv(result, file.path(exportFolder,folder))
-
+      PatientLevelPrediction::savePlpShareable(
+        result = plpResult,
+        saveDirectory = file.path(exportFolder,folder),
+        minCellCount = minCellCount
+      )
     }
   }
 
-
   ### Add all to zip file ###
-  zipName <- paste0(outputFolder, '.zip')
+  zipName <- paste0(file.path(outputFolder, paste0('resultsToShare_',databaseName,'.zip')))
   OhdsiSharing::compressFolder(exportFolder, zipName)
   # delete temp folder
   unlink(exportFolder, recursive = T)
 
-  writeLines(paste("\nStudy results are compressed and ready for sharing at:", zipName))
+  ParallelLogger::logInfo(paste("\nStudy results are compressed and ready for sharing at:", zipName))
   return(zipName)
 }

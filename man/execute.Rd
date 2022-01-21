@@ -5,54 +5,32 @@
 \title{Execute the validation study}
 \usage{
 execute(
-  connectionDetails,
-  databaseName,
-  cdmDatabaseSchema,
-  cdmVersion,
-  cohortDatabaseSchema,
-  oracleTempSchema,
-  cohortTable,
+  databaseDetails,
+ 
+    restrictPlpDataSettings = PatientLevelPrediction::createRestrictPlpDataSettings(sampleSize
+    = NULL),
+  validationSettings = PatientLevelPrediction::createValidationSettings(recalibrate =
+    NULL),
   outputFolder,
   createCohorts = T,
-  recalibrate = NULL,
   runValidation = T,
   packageResults = T,
   minCellCount = 5,
-  sampleSize = NULL,
-  keepPrediction = T,
-  verbosity = "INFO"
+  logSettings = PatientLevelPrediction::createLogSettings(verbosity = "INFO", logName =
+    "validatePLP")
 )
 }
 \arguments{
-\item{connectionDetails}{An object of type \code{connectionDetails} as created using the
-\code{\link[DatabaseConnector]{createConnectionDetails}} function in the
-DatabaseConnector package.}
+\item{databaseDetails}{Database details for the validation created using \code{PatientLevelPrediction::createDatabaseDetails()}}
 
-\item{databaseName}{A string representing a shareable name of your databasd}
+\item{restrictPlpDataSettings}{Extras data settings such as sampling created using \code{PatientLevelPrediction::createRestrictPlpDataSettings()}}
 
-\item{cdmDatabaseSchema}{Schema name where your patient-level data in OMOP CDM format resides.
-Note that for SQL Server, this should include both the database and
-schema name, for example 'cdm_data.dbo'.}
-
-\item{cdmVersion}{CDM version}
-
-\item{cohortDatabaseSchema}{Schema name where intermediate data can be stored. You will need to have
-write priviliges in this schema. Note that for SQL Server, this should
-include both the database and schema name, for example 'cdm_data.dbo'.}
-
-\item{oracleTempSchema}{Should be used in Oracle to specify a schema where the user has write
-priviliges for storing temporary tables.}
-
-\item{cohortTable}{The name of the table that will be created in the work database schema.
-This table will hold the exposure and outcome cohorts used in this
-study.}
+\item{validationSettings}{Settings for the validation such as whether to recalibrate}
 
 \item{outputFolder}{Name of local folder to place results; make sure to use forward slashes
 (/)}
 
 \item{createCohorts}{Whether to create the cohorts for the study}
-
-\item{recalibrate}{Whether to recalibrate ('recalibrationintheLarge' and/or 'weakRecalibration')}
 
 \item{runValidation}{Whether to run the valdiation models}
 
@@ -60,11 +38,7 @@ study.}
 
 \item{minCellCount}{The min count for the result to be included in the package results}
 
-\item{sampleSize}{Whether to sample from the target cohort - if desired add the number to sample}
-
-\item{keepPrediction}{Whether to save the individual predictions}
-
-\item{verbosity}{Log verbosity}
+\item{logSettings}{Settings for the logging created using \code{PatientLevelPrediction::createLogSettings()}}
 }
 \description{
 Execute the validation study

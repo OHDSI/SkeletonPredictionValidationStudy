@@ -22,7 +22,6 @@
 #'
 #' @docType package
 #' @name SkeletonPredictionValidationStudy
-#' @import DatabaseConnector
-#' @importFrom magrittr %>%
+#' @importFrom dplyr %>%
 #' @importFrom rlang .data
 NULL
