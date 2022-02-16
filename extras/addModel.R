@@ -33,7 +33,7 @@ addModel <- function(
 
   # update the cohortsToCreate.csv
   cohortsToCreate <- tryCatch(
-    {read.csv(file.path(packageLocation, 'inst', 'settings', 'CohortsToCreate.csv'))},
+    {read.csv(file.path(packageLocation, 'inst', 'Cohorts.csv'))},
     error = function(e){print(e); return(list())}
   )
 
@@ -42,12 +42,6 @@ addModel <- function(
 
     newCohortsToCreate <- c()
     for(cohort in cohortIds){
-
-      nameForFile <- function(name){
-        name <- gsub(' ','_', name)
-        name <- gsub("[[:punct:]]", "_", name)
-        return(name)
-      }
 
       # extract cohort sql and json into package
       ParallelLogger::logInfo('Extracting cohorts using webapi')
@@ -67,16 +61,13 @@ addModel <- function(
       if(!dir.exists(file.path(packageLocation,'inst', 'sql', 'sql_server'))){
         dir.create(file.path(packageLocation,'inst', 'sql', 'sql_server'), recursive = T)
       }
-      if(!dir.exists(file.path(packageLocation, 'inst', 'settings'))){
-        dir.create(file.path(packageLocation, 'inst', 'settings'), recursive = T)
-      }
 
       # save cohort
       write(
         x = jsonlite::serializeJSON(cohortDefinition, digits = 23),
         file = file.path(
           packageLocation, 'inst', 'cohorts',
-          paste0(nameForFile(cohortDefinition$name), '.json')
+          paste0(cohortDefinition$id, '.json')
         )
       )
 
@@ -85,23 +76,23 @@ addModel <- function(
         x = ROhdsiWebApi::getCohortSql(cohortDefinition, baseUrl = baseUrl, generateStats = F),
         file = file.path(
           packageLocation, 'inst', 'sql', 'sql_server',
-          paste0(nameForFile(cohortDefinition$name), '.sql')
+          paste0(cohortDefinition$id, '.sql')
         )
       )
 
       newCohortsToCreate <- rbind(
         newCohortsToCreate,
         c(
-          name = nameForFile(cohortDefinition$name),
+          cohortName = cohortDefinition$name,
           cohortId = cohort,
-          atlasId = cohort
+          webApiCohortId = cohort
         )
       )
     }
 
     utils::write.table(
-      x = rbind(cohortsToCreate[,c('name','cohortId','atlasId')], newCohortsToCreate),
-      file = file.path(packageLocation, 'inst','settings', 'CohortsToCreate.csv'),
+      x = rbind(cohortsToCreate[,c('cohortName','cohortId','webApiCohortId')], newCohortsToCreate),
+      file = file.path(packageLocation, 'inst','Cohorts.csv'),
       append = F,
       row.names = F,
       sep = ','

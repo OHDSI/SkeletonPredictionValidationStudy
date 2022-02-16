@@ -41,11 +41,7 @@ execute <- function(
   if(createCohorts){
     ParallelLogger::logInfo("Creating Cohorts")
     createCohorts(
-      connectionDetails = databaseDetails$connectionDetails,
-      cdmDatabaseSchema = databaseDetails$cdmDatabaseSchema,
-      cohortDatabaseSchema = databaseDetails$cohortDatabaseSchema,
-      cohortTable = databaseDetails$cohortTable,
-      tempEmulationSchema = databaseDetails$tempEmulationSchema,
+      databaseDetails = databaseDetails,
       outputFolder = file.path(outputFolder,databaseName)
     )
   }
