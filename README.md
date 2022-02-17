@@ -28,7 +28,7 @@ Dependencies
   
 Guide
 ============
-A general guide for running a valdiation study package is available here: [Skeleton Validation Study guide](https://github.com/OHDSI/SkeletonPredictionValidationStudy/tree/master/inst/doc/UsingSkeletonValidationPackage.pdf)
+A general guide for running a valdiation study package is available here: [Skeleton Validation Study guide](https://github.com/OHDSI/SkeletonPredictionValidationStudy/tree/main/inst/doc/UsingSkeletonValidationPackage.pdf)
   
   
 A1. Installing the package from GitHub
@@ -52,7 +52,7 @@ dir.create(projectFolder,   recursive = T)
 setwd(projectFolder)
                                                                                               
 # Download the lock file:
-download.file("https://raw.githubusercontent.com/ohdsi-studies/SkeletonPredictionValidationStudy/master/renv.lock", "renv.lock")
+download.file("https://raw.githubusercontent.com/ohdsi-studies/SkeletonPredictionValidationStudy/main/renv.lock", "renv.lock")
 
 # Build the local library into projectFolder (takes a while):
 renv::init()
@@ -72,7 +72,7 @@ A2. Building the package inside RStudio
 B. Getting Started
 ===============
   1. Make sure to have either: installed (A1) or built (A2) the package 
-  2. In R, run the code in 'extras/codeToRun.R' (see [Skeleton Validation Study guide](https://github.com/OHDSI/SkeletonPredictionValidationStudy/tree/master/inst/doc/UsingSkeletonValidationPackage.pdf) for guideance)
+  2. In R, run the code in 'extras/codeToRun.R' (see [Skeleton Validation Study guide](https://github.com/OHDSI/SkeletonPredictionValidationStudy/tree/main/inst/doc/UsingSkeletonValidationPackage.pdf) for guideance)
 
 
 C. Example Code
