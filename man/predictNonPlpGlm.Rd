@@ -9,9 +9,9 @@ predictNonPlpGlm(plpModel, data, cohort)
 \arguments{
 \item{plpModel}{The model being applied}
 
-\item{plpData}{The new data}
+\item{data}{The new data}
 
-\item{population}{The new population}
+\item{cohort}{The new population}
 }
 \value{
 The population with an extra column 'value' corresponding to the patients risk

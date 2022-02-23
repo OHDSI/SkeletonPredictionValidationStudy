@@ -41,70 +41,49 @@ addCohortSettings <- function(
   return(covariateSettings)
 }
 
-#' Create the exposure and outcome cohorts
-#'
-#' @details
-#' This function will create the exposure and outcome cohorts following the definitions included in
-#' this package.
-#'
-#' @param connectionDetails    An object of type \code{connectionDetails} as created using the
-#'                             \code{\link[DatabaseConnector]{createConnectionDetails}} function in the
-#'                             DatabaseConnector package.
-#' @param cdmDatabaseSchema    Schema name where your patient-level data in OMOP CDM format resides.
-#'                             Note that for SQL Server, this should include both the database and
-#'                             schema name, for example 'cdm_data.dbo'.
-#' @param cohortDatabaseSchema Schema name where intermediate data can be stored. You will need to have
-#'                             write priviliges in this schema. Note that for SQL Server, this should
-#'                             include both the database and schema name, for example 'cdm_data.dbo'.
-#' @param cohortTable          The name of the table that will be created in the work database schema.
-#'                             This table will hold the exposure and outcome cohorts used in this
-#'                             study.
-#' @param tempEmulationSchema     Should be used in Oracle to specify a schema where the user has write
-#'                             priviliges for storing temporary tables.
-#' @param outputFolder         Name of local folder to place results; make sure to use forward slashes
-#'                             (/)
-#'
-createCohorts <- function(connectionDetails,
-                          cdmDatabaseSchema,
-                          cohortDatabaseSchema,
-                          cohortTable = "cohort",
-  tempEmulationSchema,
-                          outputFolder) {
+createCohorts <- function(
+  databaseDetails,
+  outputFolder
+) {
   if (!file.exists(outputFolder))
     dir.create(outputFolder)
 
-  conn <- DatabaseConnector::connect(connectionDetails)
+  connection <- DatabaseConnector::connect(databaseDetails$connectionDetails)
+  on.exit(DatabaseConnector::disconnect(connection))
 
-  .createCohorts(connection = conn,
-                 cdmDatabaseSchema = cdmDatabaseSchema,
-                 cohortDatabaseSchema = cohortDatabaseSchema,
-                 cohortTable = cohortTable,
-    tempEmulationSchema = tempEmulationSchema,
-                 outputFolder = outputFolder)
+  CohortGenerator::createCohortTables(connection = connection,
+                                      cohortDatabaseSchema = databaseDetails$cohortDatabaseSchema,
+                                      cohortTableNames = CohortGenerator::getCohortTableNames(
+                                        cohortTable = databaseDetails$cohortTable
+                                      )
+  )
+  cohortDefinitionSet <- CohortGenerator::getCohortDefinitionSet(packageName = "SkeletonPredictionValidationStudy",
+                                                                 settingsFileName = "Cohorts.csv",
+                                                                 cohortFileNameValue = "cohortId")
+  CohortGenerator::generateCohortSet(connection = connection,
+                                     cohortDatabaseSchema = databaseDetails$cohortDatabaseSchema,
+                                     cohortTableNames = CohortGenerator::getCohortTableNames(
+                                       cohortTable = databaseDetails$cohortTable
+                                     ),
+                                     cdmDatabaseSchema = databaseDetails$cdmDatabaseSchema,
+                                     tempEmulationSchema = databaseDetails$tempEmulationSchema,
+                                     cohortDefinitionSet = cohortDefinitionSet)
+
 
   # Check number of subjects per cohort:
-  ParallelLogger::logInfo("Counting cohorts")
-  sql <- SqlRender::loadRenderTranslateSql("GetCounts.sql",
-                                           "SkeletonPredictionValidationStudy",
-                                           dbms = connectionDetails$dbms,
-                                           oracleTempSchema = tempEmulationSchema,
-                                           cdm_database_schema = cdmDatabaseSchema,
-                                           work_database_schema = cohortDatabaseSchema,
-                                           study_cohort_table = cohortTable)
-  counts <- DatabaseConnector::querySql(conn, sql)
-  colnames(counts) <- SqlRender::snakeCaseToCamelCase(colnames(counts))
+  message("Counting cohorts")
+  counts <- CohortGenerator::getCohortCounts(connection = connection,
+                                             cohortDatabaseSchema = databaseDetails$cohortDatabaseSchema,
+                                             cohortTable = databaseDetails$cohortTable)
+
   counts <- addCohortNames(counts)
   utils::write.csv(counts, file.path(outputFolder, "CohortCounts.csv"), row.names = FALSE)
-
-  DatabaseConnector::disconnect(conn)
 }
 
-addCohortNames <- function(data, IdColumnName = "cohortDefinitionId", nameColumnName = "cohortName") {
-  pathToCsv <- system.file("settings", "CohortsToCreate.csv", package = "SkeletonPredictionValidationStudy")
-  cohortsToCreate <- utils::read.csv(pathToCsv)
+addCohortNames <- function(data, IdColumnName = "cohortId", nameColumnName = "cohortName") {
+  pathToCsv <- system.file("Cohorts.csv", package = "SkeletonPredictionValidationStudy")
 
-  idToName <- data.frame(cohortId = c(cohortsToCreate$cohortId),
-                         cohortName = c(as.character(cohortsToCreate$name)))
+  idToName <- utils::read.csv(pathToCsv)
   idToName <- idToName[order(idToName$cohortId), ]
   idToName <- idToName[!duplicated(idToName$cohortId), ]
   names(idToName)[1] <- IdColumnName
@@ -113,49 +92,9 @@ addCohortNames <- function(data, IdColumnName = "cohortDefinitionId", nameColumn
   # Change order of columns:
   idCol <- which(colnames(data) == IdColumnName)
   if (idCol < ncol(data) - 1) {
-    data <- data[, c(1:idCol, ncol(data) , (idCol+1):(ncol(data)-1))]
+    data <- data[, c(1:idCol, ncol(data) , (idCol + 1):(ncol(data) - 1))]
   }
   return(data)
-}
-
-.createCohorts <- function(connection,
-                           cdmDatabaseSchema,
-                           vocabularyDatabaseSchema = cdmDatabaseSchema,
-                           cohortDatabaseSchema,
-                           cohortTable,
-                           tempEmulationSchema,
-                           outputFolder) {
-
-  # Create study cohort table structure:
-  sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "CreateCohortTable.sql",
-                                           packageName = "SkeletonPredictionValidationStudy",
-                                           dbms = attr(connection, "dbms"),
-                                           oracleTempSchema = tempEmulationSchema,
-                                           cohort_database_schema = cohortDatabaseSchema,
-                                           cohort_table = cohortTable)
-  DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
-
-
-
-  # Instantiate cohorts:
-  pathToCsv <- system.file("settings", "CohortsToCreate.csv", package = "SkeletonPredictionValidationStudy")
-  cohortsToCreate <- utils::read.csv(pathToCsv)
-  for (i in 1:nrow(cohortsToCreate)) {
-    writeLines(paste("Creating cohort:", cohortsToCreate$name[i]))
-    sql <- SqlRender::loadRenderTranslateSql(sqlFilename = paste0(cohortsToCreate$name[i], ".sql"),
-                                             packageName = "SkeletonPredictionValidationStudy",
-                                             dbms = attr(connection, "dbms"),
-                                             oracleTempSchema = tempEmulationSchema,
-                                             cdm_database_schema = cdmDatabaseSchema,
-                                             vocabulary_database_schema = vocabularyDatabaseSchema,
-
-                                             target_database_schema = cohortDatabaseSchema,
-                                             target_cohort_table = cohortTable,
-                                             target_cohort_id = cohortsToCreate$cohortId[i])
-    DatabaseConnector::executeSql(connection, sql)
-  }
-
-
 }
 
 

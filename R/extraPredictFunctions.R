@@ -4,8 +4,8 @@
 #' This applies the existing models and calcualtes the risk for a population
 #'
 #' @param plpModel The model being applied
-#' @param plpData  The new data
-#' @param population The new population
+#' @param data  The new data
+#' @param cohort The new population
 #'
 #' @return
 #' The population with an extra column 'value' corresponding to the patients risk
