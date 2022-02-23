@@ -62,7 +62,9 @@ createCohorts <- function(
                                                                  cohortFileNameValue = "cohortId")
   CohortGenerator::generateCohortSet(connection = connection,
                                      cohortDatabaseSchema = databaseDetails$cohortDatabaseSchema,
-                                     cohortTableNames = databaseDetails$cohortTable,
+                                     cohortTableNames = CohortGenerator::getCohortTableNames(
+                                       cohortTable = databaseDetails$cohortTable
+                                     ),
                                      cdmDatabaseSchema = databaseDetails$cdmDatabaseSchema,
                                      tempEmulationSchema = databaseDetails$tempEmulationSchema,
                                      cohortDefinitionSet = cohortDefinitionSet)

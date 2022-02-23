@@ -1,7 +1,7 @@
 Package: SkeletonPredictionValidationStudy
 Type: Package
 Title: Add the title of the package here
-Version: 2.0.1
+Version: 2.0.2
 Date: 2022-02-16
 Author: your name [aut]
 Maintainer: your name <youremail@address>
@@ -24,7 +24,6 @@ Suggests:
 Remotes:
     ohdsi/CohortGenerator,
     ohdsi/OhdsiSharing,
-    ohdsi/ParallelLogger,
     ohdsi/PatientLevelPrediction
 NeedsCompilation: no
 RoxygenNote: 7.1.1
