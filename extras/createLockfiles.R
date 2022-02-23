@@ -4,9 +4,20 @@
 
 OhdsiRTools::createRenvLockFile(rootPackage = "SkeletonPredictionValidationStudy",
                                 includeRootPackage = FALSE,
-                                additionalRequiredPackages = c( "keras", "tensorflow", "plyr", "survAUC", "officer",
-                                                               "diagram", "xgboost", "DT", "shiny", "shinydashboard", "shinycssloaders",
-                                                               "DT", "htmlwidgets", "shinyWidgets", "plotly"))
+                                additionalRequiredPackages = c("CohortGenerator", # can't get this?
+                                  "survAUC",
+                                  "xgboost",
+                                  "DBI",
+                                  "DT",
+                                  "htmltools",
+                                  "Hydra",
+                                  "plotly",
+                                  "pool",
+                                  "shiny",
+                                  "shinycssloaders",
+                                  "shinydashboard",
+                                  "shinyWidgets"
+                                  ))
 
 args <- c('env', 'export','-n','r-reticulate', '--no-builds',
           '|', 'findstr', '-v', '"prefix"' ,'> pyEnvironment.yml')
