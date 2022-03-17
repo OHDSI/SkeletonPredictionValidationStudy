@@ -923,13 +923,13 @@
 		},
 		"PatientLevelPrediction" : {
 			"Package" : "PatientLevelPrediction",
-			"Version" : "5.0.0",
+			"Version" : "5.0.4",
 			"Source" : "GitHub",
 			"RemoteType" : "github",
 			"RemoteHost" : "api.github.com",
 			"RemoteRepo" : "PatientLevelPrediction",
 			"RemoteUsername" : "ohdsi",
-			"RemoteRef" : "v5.0.0"
+			"RemoteRef" : "v5.0.4"
 		},
 		"Hydra" : {
 			"Package" : "Hydra",
